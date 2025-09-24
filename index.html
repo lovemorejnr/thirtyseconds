@@ -29,18 +29,21 @@
       'Cape Town', 'Johannesburg', 'Durban', 'Soweto', 'Kruger National Park', 'Table Mountain', 'Robben Island', 'Camps Bay', 'Victoria & Alfred Waterfront', 'Apartheid Museum', 'Blyde River Canyon', 'God\'s Window', 'Union Buildings', 'Gold Reef City', 'Bo-Kaap',
       'Sun City', 'Cradle of HumanKind', 'Lion\'s Head', 'Sani Pass', 'Chapman\'s Peak Drive', 'Drakensberg Mountains', 'Oudtshoorn Caves', 'Addis Ababa', 'Alexandria', 'Alger', 'Amman', 'Ankara', 'Astana', 'Asmara', 'Baghdad', 'Baku', 'Bangkok', 'Beirut',
       'Berlin', 'Bern',
-
+      
       // 50 Movies & TV shows
       'Star Wars', 'The Matrix', 'Jurassic Park', 'Titanic', 'The Godfather', 'Pulp Fiction', 'The Shawshank Redemption', 'Forrest Gump', 'Avatar', 'Inception', 'The Dark Knight', 'E.T. the Extra-Terrestrial', 'The Lion King', 'Finding Nemo', 'Shrek',
       'The Lord of the Rings', 'Harry Potter', 'Game of Thrones', 'Breaking Bad', 'Friends', 'The Office', 'Stranger Things', 'Squid Game', 'The Crown', 'The Mandalorian', 'Ozark', 'The Queen\'s Gambit', 'Black Mirror', 'Planet Earth', 'The Simpsons',
       'The Marvel Cinematic Universe', 'The Big Bang Theory', 'Grey\'s Anatomy', 'Doctor Who', 'Sherlock', 'The Handmaid\'s Tale', 'Succession', 'Parks and Recreation', 'The Good Place', 'Downton Abbey', 'Killing Eve', 'Fleabag', 'Peaky Blinders', 'House of Cards', 'Westworld',
       'The Witcher', 'Chernobyl', 'Money Heist', 'Lupin', 'Bridgerton',
-
+      
       // 50 Music Artists & Phrases
       'Beyoncé', 'Michael Jackson', 'Taylor Swift', 'The Beatles', 'Queen', 'Elvis Presley', 'Madonna', 'Elton John', 'Freddie Mercury', 'Adele', 'Ed Sheeran', 'Coldplay', 'Drake', 'Rihanna', 'Justin Bieber',
       'Snoop Dogg', 'Dr. Dre', 'Eminem', 'Jay-Z', 'Kanye West', 'Kendrick Lamar', 'The Weeknd', 'Bruno Mars', 'Billie Eilish', 'Olivia Rodrigo', 'Harry Styles', 'Dua Lipa', 'Lana Del Rey', 'Ariana Grande', 'Post Malone',
       'Shake it Off', 'Bohemian Rhapsody', 'Gangnam Style', 'Thriller', 'Single Ladies', 'Hello, is it me you\'re looking for?', 'We will rock you', 'Don\'t Stop Believin\'', 'Lose yourself in the music', 'I Will Always Love You', 'Like a Virgin', 'Sweet Caroline', 'Respect',
       'Imagine all the people', 'Hey Jude', 'With or Without You', 'Smells Like Teen Spirit', 'Billie Jean is not my lover', 'One love, one heart', 'No woman, no cry',
+
+      // New Setswana Names
+      'Lovemore Manyuwa', 'Bobo Magetse', 'Letsile Tebogo', 'Amantle Montsho', 'Vee Mampeezy', 'Khama Billiat', 'Gaone Tlhasana', 'Kagiso Rabada',
     ];
 
     function App() {
@@ -54,6 +57,11 @@
       const [isTimesUp, setIsTimesUp] = useState(false);
       const [modalMessage, setModalMessage] = useState(null);
       const [gameWordsList, setGameWordsList] = useState([]);
+      const [usedWords, setUsedWords] = useState([]);
+      const [isMenuOpen, setIsMenuOpen] = useState(false);
+      const [isAboutOpen, setIsAboutOpen] = useState(false);
+      const [isRulesOpen, setIsRulesOpen] = useState(false);
+      const [isConfirmingExit, setIsConfirmingExit] = useState(false);
 
       // Refs
       const timerIntervalRef = useRef(null);
@@ -61,10 +69,12 @@
       const availableColors = ['#f87171', '#60a5fa', '#34d399', '#facc15', '#a78bfa', '#b4528c', '#a1c29e', '#f8a553'];
 
       // Helper function to create new team objects
+      const createId = () =>
+        (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : Math.random().toString(36).slice(2);
+
       const createTeams = (num) => {
-        const makeId = () => (crypto && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2));
         return Array.from({ length: num }, (_, i) => ({
-          id: makeId(),
+          id: createId(),
           name: `Team ${i + 1}`,
           score: 0,
           turnsPlayed: 0, // track turns
@@ -84,6 +94,7 @@
             setTimer(parsedState.timer !== undefined ? parsedState.timer : 30);
             setIsTimerRunning(parsedState.isTimerRunning !== undefined ? parsedState.isTimerRunning : false);
             setGameWordsList(parsedState.gameWordsList || []);
+            setUsedWords(parsedState.usedWords || []);
           }
         } catch (e) {
           console.error("Failed to load state from local storage:", e);
@@ -101,13 +112,14 @@
           timer,
           isTimerRunning,
           gameWordsList,
+          usedWords,
         };
         try {
           localStorage.setItem(GAME_STORAGE_KEY, JSON.stringify(gameState));
         } catch (e) {
           console.error("Failed to save state to local storage:", e);
         }
-      }, [teams, currentScreen, currentTeamIndex, timer, isTimerRunning, gameWordsList, loading]);
+      }, [teams, currentScreen, currentTeamIndex, timer, isTimerRunning, gameWordsList, usedWords, loading]);
 
       // Handle timer logic
       useEffect(() => {
@@ -141,8 +153,17 @@
         setIsTimerRunning(true);
         setCurrentScreen('turn');
         setTimer(30);
-        const shuffledWords = [...gameWords].sort(() => 0.5 - Math.random()).slice(0, 5);
+
+        const available = gameWords.filter(word => !usedWords.includes(word));
+        if (available.length < 5) {
+          setModalMessage("Not enough words for a new turn! Starting a new game...");
+          handleExitToHome();
+          return;
+        }
+
+        const shuffledWords = [...available].sort(() => 0.5 - Math.random()).slice(0, 5);
         setGameWordsList(shuffledWords);
+        setUsedWords(prevUsed => [...prevUsed, ...shuffledWords]);
       };
 
       const handleConfirmScore = (finalScore) => {
@@ -176,13 +197,32 @@
         return teams.filter(t => t.score === maxScore);
       };
 
-      const handleExitToHome = () => {
+      const performExit = () => {
+        // Stop timers
+        clearInterval(timerIntervalRef.current);
+        clearTimeout(timeoutRef.current);
+        
+        // Reset runtime state
+        setTimer(30);
+        setIsTimerRunning(false);
+        setIsTimesUp(false);
+        setIsMenuOpen(false);
+        setUsedWords([]);
+        setIsConfirmingExit(false);
+
+        // Clear saved state
         localStorage.removeItem(GAME_STORAGE_KEY);
+        
+        // Reset core game state
         setTeams([]);
-        setCurrentScreen('setup');
         setCurrentTeamIndex(0);
+        setCurrentScreen('setup');
       };
 
+      const handleExitToHome = () => {
+        setIsConfirmingExit(true);
+      };
+      
       // Screen components
 
       const SetupScreen = () => {
@@ -192,7 +232,6 @@
           if (teams.length === 0 || teams.length !== numTeams) {
             setTeams(createTeams(numTeams));
           }
-          // eslint-disable-next-line react-hooks/exhaustive-deps
         }, [numTeams]);
 
         const handleIncrement = () => {
@@ -227,7 +266,7 @@
             />
             <h1 className="text-4xl font-bold text-white mb-4">Beat the Buzzer!</h1>
             <div className="w-full max-w-lg p-6 bg-gray-800 rounded-xl shadow-xl">
-              <label htmlFor="num-teams-stepper" className="block mb-4 text-lg font-medium text-gray-300 text-center">
+              <label className="block mb-4 text-lg font-medium text-gray-300 text-center">
                 Number of Teams
               </label>
               <div className="flex items-center justify-center space-x-4 mb-4">
@@ -378,7 +417,7 @@
         const score = selectedWords.size;
 
         return (
-          <div className="flex flex-col items-center justify-between h-full p-6">
+          <div className="flex flex-col items-center justify-between h-full p-6 bg-gray-950">
             <h2 className="text-3xl font-bold text-white mb-4">Select Correct Words</h2>
             <div className="w-full max-w-lg p-4 bg-gray-800 rounded-lg shadow-lg mb-6 text-center">
               <h3 className="text-xl font-semibold text-white mb-2">{team.name}'s Score: {score}</h3>
@@ -387,8 +426,8 @@
                   <button
                     key={index}
                     onClick={() => toggleWordSelection(word)}
-                    className={`w-full p-4 rounded-xl shadow-md text-lg font-medium transition-colors duration-200 ${
-                      selectedWords.has(word) ? 'bg-green-600 text-white' : 'bg-gray-700 text-white'
+                    className={`w-full p-4 rounded-xl shadow-lg text-lg font-bold transform transition-all duration-200 hover:scale-[1.02] active:scale-95 ${
+                      selectedWords.has(word) ? 'bg-gradient-to-t from-green-700 to-green-600 text-white' : 'bg-gradient-to-t from-gray-700 to-gray-600 text-gray-200'
                     }`}
                   >
                     {word}
@@ -448,6 +487,33 @@
         );
       };
 
+      const MobileNav = () => {
+        return (
+          <>
+            <div className="fixed top-0 left-0 w-full p-4 z-50">
+              <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ transform: isMenuOpen ? 'rotate(90deg)' : 'rotate(0deg)' }}>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
+              </button>
+            </div>
+            <div className={`fixed inset-0 bg-gray-900 bg-opacity-95 z-40 transition-transform duration-300 ease-in-out ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+              <div className="flex flex-col items-center justify-center h-full space-y-8 p-6">
+                <button onClick={() => { setIsAboutOpen(true); setIsMenuOpen(false); }} className="text-4xl font-bold text-white rounded-xl py-4 px-6 w-full max-w-xs transition-colors duration-200 hover:bg-gray-800">
+                  About
+                </button>
+                <button onClick={() => { setIsRulesOpen(true); setIsMenuOpen(false); }} className="text-4xl font-bold text-white rounded-xl py-4 px-6 w-full max-w-xs transition-colors duration-200 hover:bg-gray-800">
+                  House Rules
+                </button>
+                <button onClick={handleExitToHome} className="text-4xl font-bold text-white rounded-xl py-4 px-6 w-full max-w-xs transition-colors duration-200 hover:bg-gray-800">
+                  Return to Home
+                </button>
+              </div>
+            </div>
+          </>
+        );
+      };
+
       const Modal = ({ message, onClose }) => {
         if (!message) return null;
         return (
@@ -462,10 +528,63 @@
                 OK
               </button>
             </div>
-          </div>
+            </div>
         );
       };
+      
+      const AboutScreen = ({ onClose }) => (
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-95 z-50 flex items-center justify-center p-4">
+          <div className="bg-gray-800 p-8 rounded-xl shadow-2xl max-w-md w-full text-center space-y-4">
+            <h2 className="text-4xl font-bold text-white">About the Game</h2>
+            <p className="text-gray-300 text-lg">Beat the Buzzer! is a digital adaptation of the popular party game, where teams race against the clock to guess words from a variety of categories.</p>
+            <p className="text-gray-300 text-lg">Created by Lovemore Manyuwa</p>
+            <button onClick={onClose} className="mt-4 py-3 px-8 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-colors">
+              Close
+            </button>
+          </div>
+        </div>
+      );
 
+      const HouseRulesScreen = ({ onClose }) => (
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-95 z-50 flex items-center justify-center p-4">
+          <div className="bg-gray-800 p-8 rounded-xl shadow-2xl max-w-md w-full text-center space-y-4">
+            <h2 className="text-4xl font-bold text-white">House Rules</h2>
+            <ul className="text-left text-gray-300 space-y-2 list-disc list-inside">
+              <li>Teams take turns describing words to each other within a 30-second time limit.</li>
+              <li>No using rhymes, gestures, or parts of the word itself.</li>
+              <li>Once a word is guessed, the team moves on to the next.</li>
+              <li>The team with the highest score after all rounds wins.</li>
+            </ul>
+            <button onClick={onClose} className="mt-4 py-3 px-8 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-colors">
+              Close
+            </button>
+          </div>
+        </div>
+      );
+
+      const ConfirmExitModal = ({ onConfirm, onCancel }) => (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800 p-6 rounded-lg shadow-2xl max-w-sm w-full text-center">
+            <p className="text-white text-lg font-medium mb-6">Are you sure you want to cancel the game and return to Home?</p>
+            <div className="flex justify-center space-x-4">
+              <button
+                onClick={onConfirm}
+                className="py-2 px-6 text-white rounded-lg font-bold transition-colors duration-200"
+                style={{ backgroundColor: '#B03D22' }}
+              >
+                Yes, Exit
+              </button>
+              <button
+                onClick={onCancel}
+                className="py-2 px-6 text-gray-800 bg-gray-200 rounded-lg font-bold transition-colors duration-200 hover:bg-gray-300"
+              >
+                No, Continue
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+      
       let content;
       switch (currentScreen) {
         case 'setup':
@@ -490,11 +609,12 @@
 
       return (
         <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center p-4 font-sans">
+          <MobileNav />
           <div className="w-full max-w-2xl min-h-[90vh] bg-gray-900 rounded-2xl shadow-2xl p-6 flex flex-col justify-center items-center">
             {loading ? (
               <div className="flex flex-col items-center">
                 <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2" style={{ borderColor: '#B03D22' }}></div>
-                <p className="text-white text-xl mt-3">Loading Game...</p>
+                <p className="text-white text-xl">Loading Game...</p>
               </div>
             ) : (
               content
@@ -506,6 +626,9 @@
             </div>
           )}
           <Modal message={modalMessage} onClose={() => setModalMessage(null)} />
+          {isAboutOpen && <AboutScreen onClose={() => setIsAboutOpen(false)} />}
+          {isRulesOpen && <HouseRulesScreen onClose={() => setIsRulesOpen(false)} />}
+          {isConfirmingExit && <ConfirmExitModal onConfirm={performExit} onCancel={() => setIsConfirmingExit(false)} />}
         </div>
       );
     }
