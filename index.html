@@ -2,73 +2,516 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Beat the Buzzer - 30 Seconds Game</title>
-  
-  <!-- Tailwind CSS CDN -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Beat the Buzzer</title>
+  <!-- Tailwind Play CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- React & ReactDOM CDN -->
-  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
-
-  <!-- Babel for JSX support -->
+  <!-- React + ReactDOM (Development) -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <!-- Babel to transpile JSX in the browser -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
 </head>
-<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center">
-
-  <!-- React Root -->
+<body class="bg-gray-900">
   <div id="root"></div>
 
-  <!-- Your React Code -->
   <script type="text/babel">
-
     const { useState, useEffect, useRef } = React;
-
-    // ---------------------------
-    // Paste your entire App code here
-    // ---------------------------
 
     // A key to identify our game data in local storage
     const GAME_STORAGE_KEY = '30_seconds_game_state';
     const TOTAL_TURNS = 30;
 
+    // Data for the game cards.
     const gameWords = [
-      'Empire State Building','Hollywood','Grand Canyon','Statue of Liberty','Times Square','Golden Gate Bridge',
-      'Niagara Falls','Mount Rushmore','White House','Las Vegas','Yellowstone National Park','Miami Beach','Brooklyn Bridge',
-      'New Orleans','Route 66','Cape Town','Johannesburg','Durban','Soweto','Kruger National Park','Table Mountain',
-      'Robben Island','Camps Bay','Victoria & Alfred Waterfront','Apartheid Museum','Blyde River Canyon',"God's Window",
-      'Union Buildings','Gold Reef City','Bo-Kaap','Sun City','Cradle of HumanKind',"Lion's Head",'Sani Pass',
-      "Chapman's Peak Drive",'Drakensberg Mountains','Oudtshoorn Caves','Addis Ababa','Alexandria','Alger','Amman','Ankara',
-      'Astana','Asmara','Baghdad','Baku','Bangkok','Beirut','Berlin','Bern',
-      'Star Wars','The Matrix','Jurassic Park','Titanic','The Godfather','Pulp Fiction','The Shawshank Redemption',
-      'Forrest Gump','Avatar','Inception','The Dark Knight','E.T. the Extra-Terrestrial','The Lion King','Finding Nemo','Shrek',
-      'The Lord of the Rings','Harry Potter','Game of Thrones','Breaking Bad','Friends','The Office','Stranger Things',
-      'Squid Game','The Crown','The Mandalorian','Ozark',"The Queen's Gambit",'Black Mirror','Planet Earth','The Simpsons',
-      'The Marvel Cinematic Universe','The Big Bang Theory',"Grey's Anatomy",'Doctor Who','Sherlock',"The Handmaid's Tale",
-      'Succession','Parks and Recreation','The Good Place','Downton Abbey','Killing Eve','Fleabag','Peaky Blinders',
-      'House of Cards','Westworld','The Witcher','Chernobyl','Money Heist','Lupin','Bridgerton',
-      'Beyoncé','Michael Jackson','Taylor Swift','The Beatles','Queen','Elvis Presley','Madonna','Elton John','Freddie Mercury',
-      'Adele','Ed Sheeran','Coldplay','Drake','Rihanna','Justin Bieber','Snoop Dogg','Dr. Dre','Eminem','Jay-Z','Kanye West',
-      'Kendrick Lamar','The Weeknd','Bruno Mars','Billie Eilish','Olivia Rodrigo','Harry Styles','Dua Lipa','Lana Del Rey',
-      'Ariana Grande','Post Malone','Shake it Off','Bohemian Rhapsody','Gangnam Style','Thriller',"Single Ladies",
-      "Hello, is it me you're looking for?",'We will rock you',"Don't Stop Believin'",'Lose yourself in the music',
-      'I Will Always Love You','Like a Virgin','Sweet Caroline','Respect','Imagine all the people','Hey Jude',
-      'With or Without You','Smells Like Teen Spirit','Billie Jean is not my lover','One love, one heart','No woman, no cry',
-      // Setswana Names
-      'Lovemore Manyuwa','Bobo Magetse','Letsile Tebogo','Amantle Montsho','Vee Mampeezy','Khama Billiat',
-      'Gaone Tlhasana','Kagiso Rabada',
+      // 50 American & South African Places
+      'Empire State Building', 'Hollywood', 'Grand Canyon', 'Statue of Liberty', 'Times Square', 'Golden Gate Bridge', 'Niagara Falls', 'Mount Rushmore', 'White House', 'Las Vegas', 'Yellowstone National Park', 'Miami Beach', 'Brooklyn Bridge', 'New Orleans', 'Route 66',
+      'Cape Town', 'Johannesburg', 'Durban', 'Soweto', 'Kruger National Park', 'Table Mountain', 'Robben Island', 'Camps Bay', 'Victoria & Alfred Waterfront', 'Apartheid Museum', 'Blyde River Canyon', 'God\'s Window', 'Union Buildings', 'Gold Reef City', 'Bo-Kaap',
+      'Sun City', 'Cradle of HumanKind', 'Lion\'s Head', 'Sani Pass', 'Chapman\'s Peak Drive', 'Drakensberg Mountains', 'Oudtshoorn Caves', 'Addis Ababa', 'Alexandria', 'Alger', 'Amman', 'Ankara', 'Astana', 'Asmara', 'Baghdad', 'Baku', 'Bangkok', 'Beirut',
+      'Berlin', 'Bern',
+
+      // 50 Movies & TV shows
+      'Star Wars', 'The Matrix', 'Jurassic Park', 'Titanic', 'The Godfather', 'Pulp Fiction', 'The Shawshank Redemption', 'Forrest Gump', 'Avatar', 'Inception', 'The Dark Knight', 'E.T. the Extra-Terrestrial', 'The Lion King', 'Finding Nemo', 'Shrek',
+      'The Lord of the Rings', 'Harry Potter', 'Game of Thrones', 'Breaking Bad', 'Friends', 'The Office', 'Stranger Things', 'Squid Game', 'The Crown', 'The Mandalorian', 'Ozark', 'The Queen\'s Gambit', 'Black Mirror', 'Planet Earth', 'The Simpsons',
+      'The Marvel Cinematic Universe', 'The Big Bang Theory', 'Grey\'s Anatomy', 'Doctor Who', 'Sherlock', 'The Handmaid\'s Tale', 'Succession', 'Parks and Recreation', 'The Good Place', 'Downton Abbey', 'Killing Eve', 'Fleabag', 'Peaky Blinders', 'House of Cards', 'Westworld',
+      'The Witcher', 'Chernobyl', 'Money Heist', 'Lupin', 'Bridgerton',
+
+      // 50 Music Artists & Phrases
+      'Beyoncé', 'Michael Jackson', 'Taylor Swift', 'The Beatles', 'Queen', 'Elvis Presley', 'Madonna', 'Elton John', 'Freddie Mercury', 'Adele', 'Ed Sheeran', 'Coldplay', 'Drake', 'Rihanna', 'Justin Bieber',
+      'Snoop Dogg', 'Dr. Dre', 'Eminem', 'Jay-Z', 'Kanye West', 'Kendrick Lamar', 'The Weeknd', 'Bruno Mars', 'Billie Eilish', 'Olivia Rodrigo', 'Harry Styles', 'Dua Lipa', 'Lana Del Rey', 'Ariana Grande', 'Post Malone',
+      'Shake it Off', 'Bohemian Rhapsody', 'Gangnam Style', 'Thriller', 'Single Ladies', 'Hello, is it me you\'re looking for?', 'We will rock you', 'Don\'t Stop Believin\'', 'Lose yourself in the music', 'I Will Always Love You', 'Like a Virgin', 'Sweet Caroline', 'Respect',
+      'Imagine all the people', 'Hey Jude', 'With or Without You', 'Smells Like Teen Spirit', 'Billie Jean is not my lover', 'One love, one heart', 'No woman, no cry',
     ];
 
-    // ---- Paste the rest of your App component here (all the useStates, Screens, logic, etc.) ----
-    // I've shortened here, but you can just copy from your code above without the "export default App;"
+    function App() {
+      // Game State
+      const [teams, setTeams] = useState([]);
+      const [currentScreen, setCurrentScreen] = useState('setup');
+      const [currentTeamIndex, setCurrentTeamIndex] = useState(0);
+      const [timer, setTimer] = useState(30);
+      const [isTimerRunning, setIsTimerRunning] = useState(false);
+      const [loading, setLoading] = useState(true);
+      const [isTimesUp, setIsTimesUp] = useState(false);
+      const [modalMessage, setModalMessage] = useState(null);
+      const [gameWordsList, setGameWordsList] = useState([]);
 
-    // Finally render App
-    const root = ReactDOM.createRoot(document.getElementById("root"));
+      // Refs
+      const timerIntervalRef = useRef(null);
+      const timeoutRef = useRef(null);
+      const availableColors = ['#f87171', '#60a5fa', '#34d399', '#facc15', '#a78bfa', '#b4528c', '#a1c29e', '#f8a553'];
+
+      // Helper function to create new team objects
+      const createTeams = (num) => {
+        const makeId = () => (crypto && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2));
+        return Array.from({ length: num }, (_, i) => ({
+          id: makeId(),
+          name: `Team ${i + 1}`,
+          score: 0,
+          turnsPlayed: 0, // track turns
+          color: availableColors[i % availableColors.length],
+        }));
+      };
+
+      // Load state from local storage on initial mount
+      useEffect(() => {
+        try {
+          const storedState = localStorage.getItem(GAME_STORAGE_KEY);
+          if (storedState) {
+            const parsedState = JSON.parse(storedState);
+            setTeams(parsedState.teams || []);
+            setCurrentScreen(parsedState.currentScreen || 'setup');
+            setCurrentTeamIndex(parsedState.currentTeamIndex || 0);
+            setTimer(parsedState.timer !== undefined ? parsedState.timer : 30);
+            setIsTimerRunning(parsedState.isTimerRunning !== undefined ? parsedState.isTimerRunning : false);
+            setGameWordsList(parsedState.gameWordsList || []);
+          }
+        } catch (e) {
+          console.error("Failed to load state from local storage:", e);
+        }
+        setLoading(false);
+      }, []);
+
+      // Save state to local storage whenever a relevant state changes
+      useEffect(() => {
+        if (loading) return;
+        const gameState = {
+          teams,
+          currentScreen,
+          currentTeamIndex,
+          timer,
+          isTimerRunning,
+          gameWordsList,
+        };
+        try {
+          localStorage.setItem(GAME_STORAGE_KEY, JSON.stringify(gameState));
+        } catch (e) {
+          console.error("Failed to save state to local storage:", e);
+        }
+      }, [teams, currentScreen, currentTeamIndex, timer, isTimerRunning, gameWordsList, loading]);
+
+      // Handle timer logic
+      useEffect(() => {
+        if (isTimerRunning && timer > 0) {
+          timerIntervalRef.current = setInterval(() => {
+            setTimer(prev => {
+              if (prev <= 1) {
+                setIsTimerRunning(false);
+                setIsTimesUp(true);
+                return 0;
+              }
+              return prev - 1;
+            });
+          }, 1000);
+        }
+        return () => clearInterval(timerIntervalRef.current);
+      }, [isTimerRunning, timer]);
+
+      // Handle time's up screen transition
+      useEffect(() => {
+        if (isTimesUp) {
+          timeoutRef.current = setTimeout(() => {
+            setIsTimesUp(false);
+            setCurrentScreen('scoreSelection');
+          }, 2000);
+        }
+        return () => clearTimeout(timeoutRef.current);
+      }, [isTimesUp]);
+
+      const handleStartTurn = () => {
+        setIsTimerRunning(true);
+        setCurrentScreen('turn');
+        setTimer(30);
+        const shuffledWords = [...gameWords].sort(() => 0.5 - Math.random()).slice(0, 5);
+        setGameWordsList(shuffledWords);
+      };
+
+      const handleConfirmScore = (finalScore) => {
+        const newTeams = [...teams];
+        newTeams[currentTeamIndex].score += finalScore;
+        newTeams[currentTeamIndex].turnsPlayed++;
+        setTeams(newTeams);
+
+        // Check if the game is over
+        const allTurnsCompleted = newTeams.every(team => team.turnsPlayed >= TOTAL_TURNS);
+
+        if (allTurnsCompleted) {
+          setCurrentScreen('end');
+        } else {
+          // Move to the next team
+          const nextTeamIndex = (currentTeamIndex + 1) % newTeams.length;
+          setCurrentTeamIndex(nextTeamIndex);
+          setCurrentScreen('lobby');
+        }
+      };
+
+      const handleTeamNameChange = (e, index) => {
+        const newTeams = [...teams];
+        newTeams[index].name = e.target.value;
+        setTeams(newTeams);
+      };
+
+      const getWinner = () => {
+        if (teams.length === 0) return [];
+        const maxScore = Math.max(...teams.map(t => t.score));
+        return teams.filter(t => t.score === maxScore);
+      };
+
+      const handleExitToHome = () => {
+        localStorage.removeItem(GAME_STORAGE_KEY);
+        setTeams([]);
+        setCurrentScreen('setup');
+        setCurrentTeamIndex(0);
+      };
+
+      // Screen components
+
+      const SetupScreen = () => {
+        const [numTeams, setNumTeams] = useState(teams.length > 0 ? teams.length : 2);
+
+        useEffect(() => {
+          if (teams.length === 0 || teams.length !== numTeams) {
+            setTeams(createTeams(numTeams));
+          }
+          // eslint-disable-next-line react-hooks/exhaustive-deps
+        }, [numTeams]);
+
+        const handleIncrement = () => {
+          if (numTeams < 8) {
+            setNumTeams(prev => prev + 1);
+          }
+        };
+
+        const handleDecrement = () => {
+          if (numTeams > 2) {
+            setNumTeams(prev => prev - 1);
+          }
+        };
+
+        const handleStartGame = () => {
+          if (teams.some(team => team.name.trim() === '')) {
+            setModalMessage('Please enter names for all teams.');
+            return;
+          }
+          setCurrentScreen('lobby');
+          setCurrentTeamIndex(0);
+        };
+
+        return (
+          <div className="flex flex-col items-center justify-center p-6 space-y-6">
+            {/* Placeholder for the logo. Replace the src with your public logo URL. */}
+            <img
+              src="https://res.cloudinary.com/dl4qho6ia/image/upload/v1758680393/30_SECONDS_oqivzk.png"
+              alt="Game Logo"
+              className="h-40 w-40 rounded-full mx-auto mb-4 border-4"
+              style={{ borderColor: '#B03D22' }}
+            />
+            <h1 className="text-4xl font-bold text-white mb-4">Beat the Buzzer!</h1>
+            <div className="w-full max-w-lg p-6 bg-gray-800 rounded-xl shadow-xl">
+              <label htmlFor="num-teams-stepper" className="block mb-4 text-lg font-medium text-gray-300 text-center">
+                Number of Teams
+              </label>
+              <div className="flex items-center justify-center space-x-4 mb-4">
+                <button
+                  onClick={handleDecrement}
+                  className="p-3 bg-gray-700 text-white rounded-lg shadow-md hover:bg-gray-600 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={numTeams <= 2}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                  </svg>
+                </button>
+                <div className="text-3xl font-extrabold text-white w-12 text-center">
+                  {numTeams}
+                </div>
+                <button
+                  onClick={handleIncrement}
+                  className="p-3 bg-gray-700 text-white rounded-lg shadow-md hover:bg-gray-600 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={numTeams >= 8}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                </button>
+              </div>
+              <div className="space-y-4 max-h-80 overflow-y-auto">
+                {teams.map((team, index) => (
+                  <input
+                    key={team.id}
+                    type="text"
+                    placeholder="Enter your team name"
+                    value={team.name}
+                    onChange={(e) => handleTeamNameChange(e, index)}
+                    onFocus={() => console.log(`Input for ${team.name} gained focus.`)}
+                    onBlur={() => console.log(`Input for ${team.name} lost focus.`)}
+                    className="w-full p-3 rounded-lg text-gray-900 bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-center placeholder-gray-500 placeholder:text-center"
+                  />
+                ))}
+              </div>
+              <button
+                onClick={handleStartGame}
+                className="w-full mt-6 py-4 px-6 text-xl font-bold text-white rounded-xl shadow-lg transform transition-transform duration-200 hover:scale-105 active:scale-95"
+                style={{ backgroundColor: '#B03D22' }}
+              >
+                Start Game
+              </button>
+            </div>
+            <div className="w-full text-center mt-4">
+              <p className="text-gray-400 text-sm">Created by Lovemore Manyuwa</p>
+            </div>
+          </div>
+        );
+      };
+
+      const LobbyScreen = () => {
+        const nextTeam = teams[currentTeamIndex];
+        const turnsRemaining = TOTAL_TURNS - nextTeam.turnsPlayed;
+
+        return (
+          <div className="flex flex-col items-center justify-center p-6 space-y-6">
+            <h1 className="text-4xl font-bold text-white">Scoreboard</h1>
+            <div className="w-full max-w-lg p-6 bg-gray-800 rounded-lg shadow-xl space-y-4">
+              {teams.map((team, index) => (
+                <div
+                  key={team.id}
+                  style={{ borderColor: team.color }}
+                  className={`flex items-center justify-between p-4 rounded-lg border-l-8 transition-transform duration-200 ${
+                    index === currentTeamIndex ? 'scale-105 bg-gray-700' : 'bg-gray-900'
+                  }`}
+                >
+                  <span className="text-xl font-medium text-white">{team.name}</span>
+                  <span className="text-3xl font-bold text-white" style={{ marginLeft: '5px' }}>{team.score}</span>
+                </div>
+              ))}
+            </div>
+            <div className="flex flex-col items-center mt-6 space-y-4">
+              <p className="text-2xl font-semibold text-gray-300">Next Team:</p>
+              <p
+                className="text-4xl font-extrabold text-white"
+                style={{ textShadow: `0 0 10px ${nextTeam.color}` }}
+              >
+                {nextTeam.name}
+              </p>
+              <p className="text-lg font-medium text-gray-400">Turns Remaining: {turnsRemaining}</p>
+              <button
+                onClick={handleStartTurn}
+                className="py-4 px-8 text-2xl font-bold text-white rounded-xl shadow-lg transform transition-transform duration-200 hover:scale-105 active:scale-95"
+                style={{ backgroundColor: '#B03D22' }}
+              >
+                START
+              </button>
+            </div>
+          </div>
+        );
+      };
+
+      const TurnScreen = () => {
+        const team = teams[currentTeamIndex];
+        const percentage = (timer / 30) * 100;
+
+        return (
+          <div className="flex flex-col items-center justify-between h-full p-6">
+            <h2 className="text-3xl font-bold text-white mb-4">{team.name}'s Turn</h2>
+            <div className="relative w-48 h-48 sm:w-64 sm:h-64 flex items-center justify-center mb-8">
+              <div
+                className="w-full h-full rounded-full transition-all duration-300"
+                style={{
+                  background: `conic-gradient(${team.color} ${percentage}%, #4b5563 ${percentage}%)`,
+                }}
+              ></div>
+              <div className="absolute inset-2 bg-gray-900 rounded-full flex items-center justify-center">
+                <span className="text-6xl font-extrabold text-white">{timer}</span>
+              </div>
+            </div>
+            <div className="w-full max-w-lg p-4 bg-gray-800 rounded-lg shadow-lg mb-6 text-center">
+              <h3 className="text-xl font-semibold text-white mb-2">Words</h3>
+              <div className="space-y-3">
+                {gameWordsList.map((word, index) => (
+                  <button
+                    key={index}
+                    className="w-full p-4 rounded-xl shadow-md text-white text-lg font-medium transition-colors duration-200 bg-gray-700 pointer-events-none"
+                  >
+                    {word}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      };
+
+      const ScoreSelectionScreen = () => {
+        const [selectedWords, setSelectedWords] = useState(new Set());
+        const team = teams[currentTeamIndex];
+
+        const toggleWordSelection = (word) => {
+          setSelectedWords(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(word)) {
+              newSet.delete(word);
+            } else {
+              newSet.add(word);
+            }
+            return newSet;
+          });
+        };
+
+        const score = selectedWords.size;
+
+        return (
+          <div className="flex flex-col items-center justify-between h-full p-6">
+            <h2 className="text-3xl font-bold text-white mb-4">Select Correct Words</h2>
+            <div className="w-full max-w-lg p-4 bg-gray-800 rounded-lg shadow-lg mb-6 text-center">
+              <h3 className="text-xl font-semibold text-white mb-2">{team.name}'s Score: {score}</h3>
+              <div className="space-y-3">
+                {gameWordsList.map((word, index) => (
+                  <button
+                    key={index}
+                    onClick={() => toggleWordSelection(word)}
+                    className={`w-full p-4 rounded-xl shadow-md text-lg font-medium transition-colors duration-200 ${
+                      selectedWords.has(word) ? 'bg-green-600 text-white' : 'bg-gray-700 text-white'
+                    }`}
+                  >
+                    {word}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <button
+              onClick={() => handleConfirmScore(score)}
+              className="w-full max-w-sm py-4 px-6 text-xl font-bold text-white rounded-xl shadow-lg transform transition-transform duration-200 hover:scale-105 active:scale-95"
+              style={{ backgroundColor: '#B03D22' }}
+            >
+              Confirm Score
+            </button>
+          </div>
+        );
+      };
+
+      const EndScreen = () => {
+        const winners = getWinner();
+        return (
+          <div className="flex flex-col items-center justify-center p-6 space-y-6">
+            <h1 className="text-4xl font-bold text-white mb-4">Game Over!</h1>
+            <h2 className="text-3xl font-extrabold text-white text-center">
+              {winners.length > 1 ? "It's a tie!" : "Winner:"}
+            </h2>
+            {winners.map(winner => (
+              <h3
+                key={winner.id}
+                className="text-5xl font-extrabold"
+                style={{ color: winner.color }}
+              >
+                {winner.name}
+              </h3>
+            ))}
+            <div className="w-full max-w-lg p-6 bg-gray-800 rounded-lg shadow-xl space-y-4 mt-6">
+              <h3 className="text-xl font-bold text-white mb-2">Final Scores</h3>
+              {[...teams].sort((a, b) => b.score - a.score).map((team) => (
+                <div
+                  key={team.id}
+                  style={{ borderColor: team.color }}
+                  className="flex items-center justify-between p-4 rounded-lg border-l-8 bg-gray-900"
+                >
+                  <span className="text-xl font-medium text-white">{team.name}</span>
+                  <span className="text-3xl font-bold text-white">{team.score}</span>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={handleExitToHome}
+              className="mt-6 py-4 px-8 text-xl font-bold text-white rounded-xl shadow-lg transform transition-transform duration-200 hover:scale-105 active:scale-95"
+              style={{ backgroundColor: '#B03D22' }}
+            >
+              Exit to Home
+            </button>
+          </div>
+        );
+      };
+
+      const Modal = ({ message, onClose }) => {
+        if (!message) return null;
+        return (
+          <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+            <div className="bg-gray-800 p-6 rounded-lg shadow-2xl max-w-sm w-full text-center">
+              <p className="text-white text-lg font-medium mb-4">{message}</p>
+              <button
+                onClick={onClose}
+                className="py-2 px-6 text-white rounded-lg font-bold"
+                style={{ backgroundColor: '#B03D22' }}
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        );
+      };
+
+      let content;
+      switch (currentScreen) {
+        case 'setup':
+          content = <SetupScreen />;
+          break;
+        case 'lobby':
+          content = <LobbyScreen />;
+          break;
+        case 'turn':
+          content = <TurnScreen />;
+          break;
+        case 'scoreSelection':
+          content = <ScoreSelectionScreen />;
+          break;
+        case 'end':
+          content = <EndScreen />;
+          break;
+        default:
+          content = <SetupScreen />;
+          break;
+      }
+
+      return (
+        <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center p-4 font-sans">
+          <div className="w-full max-w-2xl min-h-[90vh] bg-gray-900 rounded-2xl shadow-2xl p-6 flex flex-col justify-center items-center">
+            {loading ? (
+              <div className="flex flex-col items-center">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2" style={{ borderColor: '#B03D22' }}></div>
+                <p className="text-white text-xl mt-3">Loading Game...</p>
+              </div>
+            ) : (
+              content
+            )}
+          </div>
+          {isTimesUp && (
+            <div className="fixed inset-0 bg-red-800 flex items-center justify-center z-50">
+              <span className="text-6xl sm:text-8xl font-black text-white animate-pulse">TIME'S UP!</span>
+            </div>
+          )}
+          <Modal message={modalMessage} onClose={() => setModalMessage(null)} />
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
     root.render(<App />);
-
   </script>
-
 </body>
 </html>
