@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>30 Seconds: Beat the Buzzer!</title>
+  <title>30 Seconds: Beat the Buzzer</title>
   <!-- Tailwind Play CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- React + ReactDOM (Development) -->
@@ -22,31 +22,30 @@
     const GAME_STORAGE_KEY = '30_seconds_game_state';
     const TOTAL_TURNS = 30;
 
-    // Data for the game cards.
-    const gameWords = [
-      // Existing words and phrases
-      'Empire State Building', 'Hollywood', 'Grand Canyon', 'Statue of Liberty', 'Times Square', 'Golden Gate Bridge', 'Niagara Falls', 'Mount Rushmore', 'White House', 'Las Vegas', 'Yellowstone National Park', 'Miami Beach', 'Brooklyn Bridge', 'New Orleans', 'Route 66',
-      'Star Wars', 'The Matrix', 'Jurassic Park', 'Titanic', 'The Godfather', 'Pulp Fiction', 'The Shawshank Redemption', 'Forrest Gump', 'Avatar', 'Inception', 'The Dark Knight', 'E.T. the Extra-Terrestrial', 'The Lion King', 'Finding Nemo', 'Shrek',
-      'The Lord of the Rings', 'Harry Potter', 'Game of Thrones', 'Breaking Bad', 'Friends', 'The Office', 'Stranger Things', 'Squid Game', 'The Crown', 'The Mandalorian', 'Ozark', 'The Queen\'s Gambit', 'Black Mirror', 'Planet Earth', 'The Simpsons',
-      'The Marvel Cinematic Universe', 'The Big Bang Theory', 'Grey\'s Anatomy', 'Doctor Who', 'Sherlock', 'The Handmaid\'s Tale', 'Succession', 'Parks and Recreation', 'The Good Place', 'Downton Abbey', 'Killing Eve', 'Fleabag', 'Peaky Blinders', 'House of Cards', 'Westworld',
-      'The Witcher', 'Chernobyl', 'Money Heist', 'Lupin', 'Bridgerton',
-      'Beyoncé', 'Michael Jackson', 'Taylor Swift', 'The Beatles', 'Queen', 'Elvis Presley', 'Madonna', 'Elton John', 'Freddie Mercury', 'Adele', 'Ed Sheeran', 'Coldplay', 'Drake', 'Rihanna', 'Justin Bieber',
-      'Snoop Dogg', 'Dr. Dre', 'Eminem', 'Jay-Z', 'Kanye West', 'Kendrick Lamar', 'The Weeknd', 'Bruno Mars', 'Billie Eilish', 'Olivia Rodrigo', 'Harry Styles', 'Dua Lipa', 'Lana Del Rey', 'Ariana Grande', 'Post Malone',
-      'Shake it Off', 'Bohemian Rhapsody', 'Gangnam Style', 'Thriller', 'Single Ladies', 'Hello, is it me you\'re looking for?', 'We will rock you', 'Don\'t Stop Believin\'', 'Lose yourself in the music', 'I Will Always Love You', 'Like a Virgin', 'Sweet Caroline', 'Respect',
-      'Imagine all the people', 'Hey Jude', 'With or Without You', 'Smells Like Teen Spirit', 'Billie Jean is not my lover', 'One love, one heart', 'No woman, no cry',
-      
-      // New Setswana Names
-      'Lovemore Manyuwa', 'Bobo Magetse', 'Letsile Tebogo', 'Amantle Montsho', 'Vee Mampeezy', 'Khama Billiat', 'Gaone Tlhasana', 'Kagiso Rabada',
-
-      // South Africa & Botswana
-      'Johannesburg', 'Gaborone', 'Pretoria', 'Francistown', 'Maun', 'Kruger National Park', 'Okavango Delta', 'Table Mountain', 'Victoria Falls', 'Braai', 'Biltong', 'Pap', 'Seswaa', 'Vetkoek', 'Nelson Mandela', 'Desmond Tutu', 'Vuvuzela', 'Ubuntu', 'Kgosi', 'Kgotla', 'Tswana', 'Zulu', 'Xhosa', 'Safari', 'Township', 'Safari Lodge', 'Traditional Dance', 'Calabash',
-
-      // Latter-day Saint related
-      'Temple', 'Book of Mormon', 'Joseph Smith', 'Moroni', 'Salt Lake City', 'Baptism', 'Sacrament', 'Fast Sunday', 'Relief Society', 'Aaronic Priesthood', 'General Conference', 'Missionary', 'Stake', 'Ward', 'Family History', 'Prophets', 'Revelation', 'Priesthood', 'Plan of Salvation', 'Eternal Marriage',
-
-      // General/common words
-      'Sun', 'Moon', 'Star', 'River', 'Mountain', 'City', 'Car', 'House', 'Love', 'Family', 'Friends', 'Game', 'Music', 'Party', 'School', 'Work', 'Happy', 'Fast', 'Jump', 'Run', 'Read', 'Write', 'Sing', 'Dance',
-    ];
+    // The game words explicitly organized by category to ensure balanced selection per turn.
+    const wordCategories = {
+      'Places': [
+        'Empire State Building','Hollywood','Grand Canyon','Statue of Liberty','Times Square','Golden Gate Bridge','Niagara Falls','Mount Rushmore','White House','Las Vegas','Yellowstone National Park','Miami Beach','Brooklyn Bridge','New Orleans','Route 66'
+      ],
+      'Entertainment': [
+        'Star Wars','The Matrix','Jurassic Park','Titanic','The Godfather','Pulp Fiction','The Shawshank Redemption','Forrest Gump','Avatar','Inception','The Dark Knight','E.T. the Extra-Terrestrial','The Lion King','Finding Nemo','Shrek','The Lord of the Rings','Harry Potter','Game of Thrones','Breaking Bad','Friends','The Office','Stranger Things','Squid Game','The Crown','The Mandalorian','Ozark','The Queen\'s Gambit','Black Mirror','Planet Earth','The Simpsons','The Marvel Cinematic Universe','The Big Bang Theory','Grey\'s Anatomy','Doctor Who','Sherlock','The Handmaid\'s Tale','Succession','Parks and Recreation','The Good Place','Downton Abbey','Killing Eve','Fleabag','Peaky Blinders','House of Cards','Westworld','The Witcher','Chernobyl','Money Heist','Lupin','Bridgerton'
+      ],
+      'Music': [
+        'Beyoncé','Michael Jackson','Taylor Swift','The Beatles','Queen','Elvis Presley','Madonna','Elton John','Freddie Mercury','Adele','Ed Sheeran','Coldplay','Drake','Rihanna','Justin Bieber','Snoop Dogg','Dr. Dre','Eminem','Jay-Z','Kanye West','Kendrick Lamar','The Weeknd','Bruno Mars','Billie Eilish','Olivia Rodrigo','Harry Styles','Dua Lipa','Lana Del Rey','Ariana Grande','Post Malone'
+      ],
+      'Idioms/Phrases': [
+        'Shake it Off','Bohemian Rhapsody','Gangnam Style','Thriller','Single Ladies','Hello, is it me you\'re looking for?','We will rock you','Don\'t Stop Believin\'','Lose yourself in the music','I Will Always Love You','Like a Virgin','Sweet Caroline','Respect','Imagine all the people','Hey Jude','With or Without You','Smells Like Teen Spirit','Billie Jean is not my lover','One love, one heart','No woman, no cry'
+      ],
+      'Botswana/South Africa': [
+        'Lovemore Manyuwa','Bobo Magetse','Letsile Tebogo','Amantle Montsho','Vee Mampeezy','Khama Billiat','Gaone Tlhasana','Kagiso Rabada','Johannesburg','Gaborone','Pretoria','Francistown','Maun','Kruger National Park','Okavango Delta','Table Mountain','Victoria Falls','Braai','Biltong','Pap','Seswaa','Vetkoek','Nelson Mandela','Desmond Tutu','Vuvuzela','Ubuntu','Kgosi','Kgotla','Tswana','Zulu','Xhosa','Safari','Township','Safari Lodge','Traditional Dance','Calabash'
+      ],
+      'Latter-day Saint': [
+        'Temple','Book of Mormon','Joseph Smith','Moroni','Salt Lake City','Baptism','Sacrament','Fast Sunday','Relief Society','Aaronic Priesthood','General Conference','Missionary','Stake','Ward','Family History','Prophets','Revelation','Priesthood','Plan of Salvation','Eternal Marriage'
+      ],
+      'General Knowledge': [
+        'Sun','Moon','Star','River','Mountain','City','Car','House','Love','Family','Friends','Game','Music','Party','School','Work','Happy','Fast','Jump','Run','Read','Write','Sing','Dance'
+      ]
+    };
 
     function App() {
       // Game State
@@ -59,7 +58,7 @@
       const [isTimesUp, setIsTimesUp] = useState(false);
       const [modalMessage, setModalMessage] = useState(null);
       const [gameWordsList, setGameWordsList] = useState([]);
-      const [usedWords, setUsedWords] = useState([]);
+      const [usedWordsByCategory, setUsedWordsByCategory] = useState({});
       const [isMenuOpen, setIsMenuOpen] = useState(false);
       const [isAboutOpen, setIsAboutOpen] = useState(false);
       const [isRulesOpen, setIsRulesOpen] = useState(false);
@@ -68,57 +67,69 @@
       // Refs
       const timerIntervalRef = useRef(null);
       const timeoutRef = useRef(null);
-      const audioRef = useRef(null);
+      const audioRef = useRef(null); // Ref for the audio element
       const availableColors = ['#f87171', '#60a5fa', '#34d399', '#facc15', '#a78bfa', '#b4528c', '#a1c29e', '#f8a553'];
-      
-      // Load Google Fonts dynamically
+
+      // Font loaders
       useEffect(() => {
-        const makeLink = (href) => {
-          const l = document.createElement('link');
-          l.rel = 'stylesheet';
-          l.href = href;
-          document.head.appendChild(l);
-          return l;
-        };
-        const l1 = makeLink('https://fonts.googleapis.com/css2?family=Bakbak+One&display=swap');
-        const l2 = makeLink('https://fonts.googleapis.com/css2?family=Racing+Sans+One&display=swap');
-        const l3 = makeLink('https://fonts.googleapis.com/css2?family=Honk&display=swap');
-        const l4 = makeLink('https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap');
+        const linkBakbakOne = document.createElement('link');
+        linkBakbakOne.href = 'https://fonts.googleapis.com/css2?family=Bakbak+One&display=swap';
+        linkBakbakOne.rel = 'stylesheet';
+        document.head.appendChild(linkBakbakOne);
+
+        const linkRacingSansOne = document.createElement('link');
+        linkRacingSansOne.href = 'https://fonts.googleapis.com/css2?family=Racing+Sans+One&display=swap';
+        linkRacingSansOne.rel = 'stylesheet';
+        document.head.appendChild(linkRacingSansOne);
+
+        const linkHonk = document.createElement('link');
+        linkHonk.href = 'https://fonts.googleapis.com/css2?family=Honk&display=swap';
+        linkHonk.rel = 'stylesheet';
+        document.head.appendChild(linkHonk);
+
+        const linkOrbitron = document.createElement('link');
+        linkOrbitron.href = 'https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap';
+        linkOrbitron.rel = 'stylesheet';
+        document.head.appendChild(linkOrbitron);
+
         return () => {
-          [l1, l2, l3, l4].forEach(l => l && document.head.removeChild(l));
+          document.head.removeChild(linkBakbakOne);
+          document.head.removeChild(linkRacingSansOne);
+          document.head.removeChild(linkHonk);
+          document.head.removeChild(linkOrbitron);
         };
       }, []);
 
-      // Helper to create teams with safe ID
-      const makeId = () =>
+      // ID helper with fallback (crypto.randomUUID may not exist in some browsers / file contexts)
+      const createId = () =>
         (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : Math.random().toString(36).slice(2);
 
-      const createTeams = (numTeams) => {
-        return Array.from({ length: numTeams }, (_, i) => ({
-          id: makeId(),
+      // Helper to create team objects
+      const createTeams = (numTeams) =>
+        Array.from({ length: numTeams }, (_, i) => ({
+          id: createId(),
           name: `Team ${i + 1}`,
           score: 0,
           turnsPlayed: 0,
           color: availableColors[i % availableColors.length],
         }));
-      };
-      
-      // Load state from local storage on mount
+
+      // Load state from local storage on initial mount
       useEffect(() => {
         try {
           const storedState = localStorage.getItem(GAME_STORAGE_KEY);
           if (storedState) {
-            const parsed = JSON.parse(storedState);
-            setTeams(parsed.teams || []);
-            setCurrentScreen(parsed.currentScreen || 'setup');
-            setCurrentTeamIndex(parsed.currentTeamIndex || 0);
-            setTimer(parsed.timer !== undefined ? parsed.timer : 30);
-            setIsTimerRunning(parsed.isTimerRunning !== undefined ? parsed.isTimerRunning : false);
-            setGameWordsList(parsed.gameWordsList || []);
-            setUsedWords(parsed.usedWords || []);
+            const parsedState = JSON.parse(storedState);
+            setTeams(parsedState.teams || []);
+            setCurrentScreen(parsedState.currentScreen || 'setup');
+            setCurrentTeamIndex(parsedState.currentTeamIndex || 0);
+            setTimer(parsedState.timer !== undefined ? parsedState.timer : 30);
+            setIsTimerRunning(parsedState.isTimerRunning !== undefined ? parsedState.isTimerRunning : false);
+            setGameWordsList(parsedState.gameWordsList || []);
+            setUsedWordsByCategory(parsedState.usedWordsByCategory || {});
           }
         } catch (e) {
-          console.error("Failed to load state:", e);
+          console.error("Failed to load state from local storage:", e);
         }
         setLoading(false);
       }, []);
@@ -133,14 +144,14 @@
           timer,
           isTimerRunning,
           gameWordsList,
-          usedWords,
+          usedWordsByCategory,
         };
         try {
           localStorage.setItem(GAME_STORAGE_KEY, JSON.stringify(gameState));
         } catch (e) {
-          console.error("Failed to save state:", e);
+          console.error("Failed to save state to local storage:", e);
         }
-      }, [teams, currentScreen, currentTeamIndex, timer, isTimerRunning, gameWordsList, usedWords, loading]);
+      }, [teams, currentScreen, currentTeamIndex, timer, isTimerRunning, gameWordsList, usedWordsByCategory, loading]);
 
       // Timer
       useEffect(() => {
@@ -159,14 +170,14 @@
         return () => clearInterval(timerIntervalRef.current);
       }, [isTimerRunning, timer]);
 
-      // Time's up overlay + audio
+      // Time's up: audio + transition
       useEffect(() => {
         if (isTimesUp) {
           if (!audioRef.current) {
             audioRef.current = new Audio('https://res.cloudinary.com/dl4qho6ia/video/upload/v1758802240/sound_zb7rqv.wav');
             audioRef.current.loop = true;
           }
-          try { audioRef.current.play(); } catch (e) { console.error("Autoplay blocked:", e); }
+          try { audioRef.current.play(); } catch (e) { console.error("Failed to play audio:", e); }
 
           timeoutRef.current = setTimeout(() => {
             setIsTimesUp(false);
@@ -187,15 +198,40 @@
         setCurrentScreen('turn');
         setTimer(30);
 
-        const available = gameWords.filter(w => !usedWords.includes(w));
-        if (available.length < 5) {
-          setModalMessage("Not enough words for a new turn! Starting a new game...");
-          handleExitToHome();
+        const categories = Object.keys(wordCategories);
+        if (categories.length < 5) {
+          setModalMessage("Not enough categories to start a turn. Please add more words.");
           return;
         }
-        const picks = [...available].sort(() => 0.5 - Math.random()).slice(0, 5);
-        setGameWordsList(picks);
-        setUsedWords(prev => [...prev, ...picks]);
+
+        const newTurnWords = [];
+        const updatedUsedWords = { ...usedWordsByCategory };
+        const shuffledCategories = [...categories].sort(() => 0.5 - Math.random());
+
+        for (let i = 0; i < 5; i++) {
+          const category = shuffledCategories[i];
+          let availableWords = wordCategories[category].filter(
+            word => !(updatedUsedWords[category] || []).includes(word)
+          );
+
+          // If empty, reset that category's used list
+          if (availableWords.length === 0) {
+            updatedUsedWords[category] = [];
+            availableWords = wordCategories[category];
+          }
+
+          if (availableWords.length > 0) {
+            const selectedWord = availableWords[Math.floor(Math.random() * availableWords.length)];
+            newTurnWords.push(selectedWord);
+            updatedUsedWords[category] = [...(updatedUsedWords[category] || []), selectedWord];
+          } else {
+            setModalMessage("Error: Could not find enough words for a new turn. Please try again.");
+            return;
+          }
+        }
+
+        setGameWordsList(newTurnWords);
+        setUsedWordsByCategory(updatedUsedWords);
       };
 
       const handleConfirmScore = (finalScore) => {
@@ -204,16 +240,16 @@
         newTeams[currentTeamIndex].turnsPlayed++;
         setTeams(newTeams);
 
-        const allDone = newTeams.every(t => t.turnsPlayed >= TOTAL_TURNS);
-        if (allDone) {
+        const allTurnsCompleted = newTeams.every(team => team.turnsPlayed >= TOTAL_TURNS);
+        if (allTurnsCompleted) {
           setCurrentScreen('end');
         } else {
-          const nextIdx = (currentTeamIndex + 1) % newTeams.length;
-          setCurrentTeamIndex(nextIdx);
+          const nextTeamIndex = (currentTeamIndex + 1) % newTeams.length;
+          setCurrentTeamIndex(nextTeamIndex);
           setCurrentScreen('lobby');
         }
       };
-      
+
       const getWinner = () => {
         if (teams.length === 0) return [];
         const maxScore = Math.max(...teams.map(t => t.score));
@@ -227,7 +263,7 @@
         setIsTimerRunning(false);
         setIsTimesUp(false);
         setIsMenuOpen(false);
-        setUsedWords([]);
+        setUsedWordsByCategory({});
         setIsConfirmingExit(false);
         localStorage.removeItem(GAME_STORAGE_KEY);
         setTeams([]);
@@ -236,32 +272,30 @@
       };
 
       const handleExitToHome = () => setIsConfirmingExit(true);
-      
-      // Screens
 
+      // Screens
       const SetupScreen = () => {
         const [numTeams, setNumTeams] = useState(teams.length > 0 ? teams.length : 2);
 
         useEffect(() => {
-          // Keep existing teams where possible
-          if (teams.length !== numTeams) {
-            const next = Array.from({ length: numTeams }, (_, i) => teams[i] || {
-              id: makeId(),
-              name: `Team ${i + 1}`,
-              score: 0,
-              turnsPlayed: 0,
-              color: availableColors[i % availableColors.length],
-            });
-            setTeams(next);
+          const currentTeamCount = teams.length;
+          if (currentTeamCount !== numTeams) {
+            const newTeams = Array.from({ length: numTeams }, (_, i) =>
+              teams[i] || {
+                id: createId(),
+                name: `Team ${i + 1}`,
+                score: 0,
+                turnsPlayed: 0,
+                color: availableColors[i % availableColors.length],
+              }
+            );
+            setTeams(newTeams);
           }
         }, [numTeams, teams]);
 
-        const handleIncrement = () => numTeams < 8 && setNumTeams(n => n + 1);
-        const handleDecrement = () => numTeams > 2 && setNumTeams(n => n - 1);
-        const handleStartGame = () => {
-          setCurrentScreen('lobby');
-          setCurrentTeamIndex(0);
-        };
+        const handleIncrement = () => { if (numTeams < 8) setNumTeams(p => p + 1); };
+        const handleDecrement = () => { if (numTeams > 2) setNumTeams(p => p - 1); };
+        const handleStartGame = () => { setCurrentScreen('lobby'); setCurrentTeamIndex(0); };
 
         return (
           <div className="flex flex-col items-center justify-center p-6 space-y-6">
@@ -278,16 +312,20 @@
               </label>
               <div className="flex items-center justify-center space-x-4 mb-4">
                 <button onClick={handleDecrement} className="p-3 bg-gray-700 text-white rounded-lg shadow-md hover:bg-gray-600 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed" disabled={numTeams <= 2}>
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4"/></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                  </svg>
                 </button>
                 <div className="text-3xl font-extrabold text-white w-12 text-center">{numTeams}</div>
                 <button onClick={handleIncrement} className="p-3 bg-gray-700 text-white rounded-lg shadow-md hover:bg-gray-600 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed" disabled={numTeams >= 8}>
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4"/></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
                 </button>
               </div>
               <div className="space-y-4 max-h-80 overflow-y-auto">
                 <h3 className="text-xl font-medium text-gray-300 text-center mb-2">Teams</h3>
-                {teams.map(team => (
+                {teams.map((team) => (
                   <div key={team.id} style={{ borderColor: team.color }} className="flex items-center p-3 rounded-lg border-l-8 bg-gray-900 shadow-sm">
                     <span className="text-lg font-medium text-white">{team.name}</span>
                   </div>
@@ -338,8 +376,8 @@
         return (
           <div className="flex flex-col items-center justify-between h-full p-6">
             <div className="w-full max-w-lg p-4 bg-gray-800 rounded-lg shadow-lg mb-6 text-center">
-              <h2 className="text-3xl font-bold text-white" style={{ fontFamily: '"Racing Sans One", sans-serif' }}>
-                Current Team: <span style={{ color: team.color }}>{team.name}</span>
+              <h2 className="text-3xl font-bold" style={{ color: team.color, fontFamily: '"Racing Sans One", sans-serif' }}>
+                {team.name}
               </h2>
             </div>
             <div className="w-full max-w-lg p-4 bg-gray-800 rounded-lg shadow-lg mb-6 text-center">
@@ -377,11 +415,13 @@
 
         return (
           <div className="flex flex-col items-center justify-between h-full p-6 bg-transparent">
-            <h2 className="text-3xl font-bold text-white mb-4" style={{ fontFamily: '"Bakbak One", sans-serif' }}>
+            <h2 className="text-3xl font-bold text-white mb-4 text-center" style={{ fontFamily: '"Bakbak One", sans-serif' }}>
               Select <span style={{ color: '#159142' }}>Correct</span> Answers
             </h2>
             <div className="w-full max-w-lg p-4 bg-gray-800 rounded-lg shadow-lg mb-6 text-center">
-              <h3 className="text-2xl font-semibold text-white mb-2" style={{ fontFamily: '"Racing Sans One", sans-serif' }}>{team.name}'s Score: {score}</h3>
+              <h3 className="text-2xl font-semibold text-white mb-2" style={{ fontFamily: '"Racing Sans One", sans-serif' }}>
+                {team.name}'s Score: {score}
+              </h3>
               <div className="space-y-3">
                 {gameWordsList.map((word, index) => (
                   <button
@@ -408,13 +448,17 @@
         return (
           <div className="flex flex-col items-center justify-center p-6 space-y-6">
             <h1 className="text-4xl font-bold text-white mb-4">Game Over!</h1>
-            <h2 className="text-3xl font-extrabold text-white text-center">{winners.length > 1 ? "It's a tie!" : "Winner:"}</h2>
-            {winners.map(w => (
-              <h3 key={w.id} className="text-5xl font-extrabold" style={{ color: w.color, fontFamily: '"Racing Sans One", sans-serif' }}>{w.name}</h3>
+            <h2 className="text-3xl font-extrabold text-white text-center">
+              {winners.length > 1 ? "It's a tie!" : "Winner:"}
+            </h2>
+            {winners.map(winner => (
+              <h3 key={winner.id} className="text-5xl font-extrabold" style={{ color: winner.color, fontFamily: '"Racing Sans One", sans-serif' }}>
+                {winner.name}
+              </h3>
             ))}
             <div className="w-full max-w-lg p-6 bg-gray-800 rounded-lg shadow-xl space-y-4 mt-6">
               <h3 className="text-xl font-bold text-white mb-2">Final Scores</h3>
-              {[...teams].sort((a, b) => b.score - a.score).map(team => (
+              {[...teams].sort((a, b) => b.score - a.score).map((team) => (
                 <div key={team.id} style={{ borderColor: team.color }} className="flex items-center justify-between p-4 rounded-lg border-l-8 bg-gray-900">
                   <span className="text-2xl font-medium text-white" style={{ fontFamily: '"Racing Sans One", sans-serif' }}>{team.name}</span>
                   <span className="text-4xl font-bold text-white">{team.score}</span>
@@ -429,14 +473,14 @@
       };
 
       const MobileNav = ({ currentScreen }) => {
-        const showReturnHome = currentScreen === 'lobby' || currentScreen === 'turn';
+        const showReturnHome = ['lobby', 'turn', 'scoreSelection'].includes(currentScreen);
         return (
           <>
             <div className="fixed top-0 left-0 w-full p-4 z-50">
               <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-white p-2 rounded-full transition-all duration-300 transform hover:bg-gray-800 focus:outline-none">
                 <svg className={`h-8 w-8 transition-transform duration-300 ease-in-out transform ${isMenuOpen ? 'rotate-90' : 'rotate-0'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path className={`${isMenuOpen ? 'opacity-0' : 'opacity-100'}`} strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                  <path className={`${isMenuOpen ? 'opacity-100' : 'opacity-0'}`} strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <path className={`transition-all duration-300 ease-in-out ${isMenuOpen ? 'opacity-0' : 'opacity-100'}`} strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16"/>
+                  <path className={`transition-all duration-300 ease-in-out ${isMenuOpen ? 'opacity-100' : 'opacity-0'}`} strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/>
                 </svg>
               </button>
             </div>
@@ -468,7 +512,7 @@
           </div>
         );
       };
-      
+
       const AboutScreen = ({ onClose }) => {
         const [isVisible, setIsVisible] = useState(false);
         useEffect(() => { setIsVisible(true); }, []);
@@ -499,12 +543,12 @@
               <h2 className="text-4xl font-bold text-center" style={{ color: '#B03D22', fontFamily: '"Bakbak One", sans-serif' }}>House Rules – How to Play 30 Seconds</h2>
               <div className="text-gray-800 text-lg space-y-4 max-h-[60vh] overflow-y-auto">
                 <p><span className="font-bold" style={{ color: '#B03D22' }}>Teams:</span> Players divide into two or more teams. Each team takes turns.</p>
-                <p><span className="font-bold" style={{ color: '#B03D22' }}>Objective:</span> Guess as many words as possible from 5-word cards within <span className="font-bold" style={{ color: '#B03D22' }}>30 seconds</span>.</p>
-                <p><span className="font-bold" style={{ color: '#B03D22' }}>Describing Words:</span> The clue-giver describes without saying the word itself.</p>
-                <p><span className="font-bold" style={{ color: '#B03D22' }}>Scoring:</span> One point per correct word.</p>
-                <p><span className="font-bold" style={{ color: '#B03D22' }}>Winning:</span> Highest total score wins.</p>
-                <p><span className="font-bold" style={{ color: '#B03D22' }}>Timing:</span> A strict 30-second timer per turn.</p>
-                <p><span className="font-bold" style={{ color: '#B03D22' }}>Fun Rule:</span> Be creative—no spelling or rhyming the exact word.</p>
+                <p><span className="font-bold" style={{ color: '#B03D22' }}>Objective:</span> On your turn, your team must guess as many words as possible from cards containing 5 words each within <span className="font-bold" style={{ color: '#B03D22' }}>30 seconds</span>.</p>
+                <p><span className="font-bold" style={{ color: '#B03D22' }}>Describing Words:</span> One player (the clue-giver) describes the words without saying the word itself, using gestures or synonyms.</p>
+                <p><span className="font-bold" style={{ color: '#B03D22' }}>Scoring:</span> Each correctly guessed word earns your team a point.</p>
+                <p><span className="font-bold" style={{ color: '#B03D22' }}>Winning:</span> After all rounds, the team with the <span className="font-bold" style={{ color: '#B03D22' }}>highest score</span> wins the game.</p>
+                <p><span className="font-bold" style={{ color: '#B03D22' }}>Timing:</span> A timer ensures each turn is exactly <span className="font-bold" style={{ color: '#B03D22' }}>30 seconds</span>. When the time runs out, the turn ends immediately.</p>
+                <p><span className="font-bold" style={{ color: '#B03D22' }}>Fun Rule:</span> Encourage creativity, quick thinking, and teamwork, but no spelling or rhyming the exact word.</p>
               </div>
               <button onClick={onClose} className="w-full py-3 px-8 text-white font-bold rounded-xl hover:bg-blue-700 transition-colors" style={{ backgroundColor: '#B03D22' }}>Close</button>
             </div>
@@ -523,8 +567,8 @@
           </div>
         </div>
       );
-      
-      // Screen router
+
+      // Screen switch
       let content;
       switch (currentScreen) {
         case 'setup': content = <SetupScreen />; break;
@@ -544,7 +588,9 @@
                 <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2" style={{ borderColor: '#B03D22' }}></div>
                 <p className="text-white text-xl">Loading Game...</p>
               </div>
-            ) : content}
+            ) : (
+              content
+            )}
           </div>
           {isTimesUp && (
             <div className="fixed inset-0 bg-red-800 flex items-center justify-center z-50">
