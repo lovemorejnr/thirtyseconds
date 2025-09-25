@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Beat the Buzzer</title>
+  <title>30 Seconds: Beat the Buzzer!</title>
   <!-- Tailwind Play CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- React + ReactDOM (Development) -->
@@ -24,26 +24,28 @@
 
     // Data for the game cards.
     const gameWords = [
-      // 50 American & South African Places
+      // Existing words and phrases
       'Empire State Building', 'Hollywood', 'Grand Canyon', 'Statue of Liberty', 'Times Square', 'Golden Gate Bridge', 'Niagara Falls', 'Mount Rushmore', 'White House', 'Las Vegas', 'Yellowstone National Park', 'Miami Beach', 'Brooklyn Bridge', 'New Orleans', 'Route 66',
-      'Cape Town', 'Johannesburg', 'Durban', 'Soweto', 'Kruger National Park', 'Table Mountain', 'Robben Island', 'Camps Bay', 'Victoria & Alfred Waterfront', 'Apartheid Museum', 'Blyde River Canyon', 'God\'s Window', 'Union Buildings', 'Gold Reef City', 'Bo-Kaap',
-      'Sun City', 'Cradle of HumanKind', 'Lion\'s Head', 'Sani Pass', 'Chapman\'s Peak Drive', 'Drakensberg Mountains', 'Oudtshoorn Caves', 'Addis Ababa', 'Alexandria', 'Alger', 'Amman', 'Ankara', 'Astana', 'Asmara', 'Baghdad', 'Baku', 'Bangkok', 'Beirut',
-      'Berlin', 'Bern',
-      
-      // 50 Movies & TV shows
       'Star Wars', 'The Matrix', 'Jurassic Park', 'Titanic', 'The Godfather', 'Pulp Fiction', 'The Shawshank Redemption', 'Forrest Gump', 'Avatar', 'Inception', 'The Dark Knight', 'E.T. the Extra-Terrestrial', 'The Lion King', 'Finding Nemo', 'Shrek',
       'The Lord of the Rings', 'Harry Potter', 'Game of Thrones', 'Breaking Bad', 'Friends', 'The Office', 'Stranger Things', 'Squid Game', 'The Crown', 'The Mandalorian', 'Ozark', 'The Queen\'s Gambit', 'Black Mirror', 'Planet Earth', 'The Simpsons',
       'The Marvel Cinematic Universe', 'The Big Bang Theory', 'Grey\'s Anatomy', 'Doctor Who', 'Sherlock', 'The Handmaid\'s Tale', 'Succession', 'Parks and Recreation', 'The Good Place', 'Downton Abbey', 'Killing Eve', 'Fleabag', 'Peaky Blinders', 'House of Cards', 'Westworld',
       'The Witcher', 'Chernobyl', 'Money Heist', 'Lupin', 'Bridgerton',
-      
-      // 50 Music Artists & Phrases
       'Beyoncé', 'Michael Jackson', 'Taylor Swift', 'The Beatles', 'Queen', 'Elvis Presley', 'Madonna', 'Elton John', 'Freddie Mercury', 'Adele', 'Ed Sheeran', 'Coldplay', 'Drake', 'Rihanna', 'Justin Bieber',
       'Snoop Dogg', 'Dr. Dre', 'Eminem', 'Jay-Z', 'Kanye West', 'Kendrick Lamar', 'The Weeknd', 'Bruno Mars', 'Billie Eilish', 'Olivia Rodrigo', 'Harry Styles', 'Dua Lipa', 'Lana Del Rey', 'Ariana Grande', 'Post Malone',
       'Shake it Off', 'Bohemian Rhapsody', 'Gangnam Style', 'Thriller', 'Single Ladies', 'Hello, is it me you\'re looking for?', 'We will rock you', 'Don\'t Stop Believin\'', 'Lose yourself in the music', 'I Will Always Love You', 'Like a Virgin', 'Sweet Caroline', 'Respect',
       'Imagine all the people', 'Hey Jude', 'With or Without You', 'Smells Like Teen Spirit', 'Billie Jean is not my lover', 'One love, one heart', 'No woman, no cry',
-
+      
       // New Setswana Names
       'Lovemore Manyuwa', 'Bobo Magetse', 'Letsile Tebogo', 'Amantle Montsho', 'Vee Mampeezy', 'Khama Billiat', 'Gaone Tlhasana', 'Kagiso Rabada',
+
+      // South Africa & Botswana
+      'Johannesburg', 'Gaborone', 'Pretoria', 'Francistown', 'Maun', 'Kruger National Park', 'Okavango Delta', 'Table Mountain', 'Victoria Falls', 'Braai', 'Biltong', 'Pap', 'Seswaa', 'Vetkoek', 'Nelson Mandela', 'Desmond Tutu', 'Vuvuzela', 'Ubuntu', 'Kgosi', 'Kgotla', 'Tswana', 'Zulu', 'Xhosa', 'Safari', 'Township', 'Safari Lodge', 'Traditional Dance', 'Calabash',
+
+      // Latter-day Saint related
+      'Temple', 'Book of Mormon', 'Joseph Smith', 'Moroni', 'Salt Lake City', 'Baptism', 'Sacrament', 'Fast Sunday', 'Relief Society', 'Aaronic Priesthood', 'General Conference', 'Missionary', 'Stake', 'Ward', 'Family History', 'Prophets', 'Revelation', 'Priesthood', 'Plan of Salvation', 'Eternal Marriage',
+
+      // General/common words
+      'Sun', 'Moon', 'Star', 'River', 'Mountain', 'City', 'Car', 'House', 'Love', 'Family', 'Friends', 'Game', 'Music', 'Party', 'School', 'Work', 'Happy', 'Fast', 'Jump', 'Run', 'Read', 'Write', 'Sing', 'Dance',
     ];
 
     function App() {
@@ -66,43 +68,62 @@
       // Refs
       const timerIntervalRef = useRef(null);
       const timeoutRef = useRef(null);
+      const audioRef = useRef(null);
       const availableColors = ['#f87171', '#60a5fa', '#34d399', '#facc15', '#a78bfa', '#b4528c', '#a1c29e', '#f8a553'];
+      
+      // Load Google Fonts dynamically
+      useEffect(() => {
+        const makeLink = (href) => {
+          const l = document.createElement('link');
+          l.rel = 'stylesheet';
+          l.href = href;
+          document.head.appendChild(l);
+          return l;
+        };
+        const l1 = makeLink('https://fonts.googleapis.com/css2?family=Bakbak+One&display=swap');
+        const l2 = makeLink('https://fonts.googleapis.com/css2?family=Racing+Sans+One&display=swap');
+        const l3 = makeLink('https://fonts.googleapis.com/css2?family=Honk&display=swap');
+        const l4 = makeLink('https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap');
+        return () => {
+          [l1, l2, l3, l4].forEach(l => l && document.head.removeChild(l));
+        };
+      }, []);
 
-      // Helper function to create new team objects
-      const createId = () =>
+      // Helper to create teams with safe ID
+      const makeId = () =>
         (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : Math.random().toString(36).slice(2);
 
-      const createTeams = (num) => {
-        return Array.from({ length: num }, (_, i) => ({
-          id: createId(),
+      const createTeams = (numTeams) => {
+        return Array.from({ length: numTeams }, (_, i) => ({
+          id: makeId(),
           name: `Team ${i + 1}`,
           score: 0,
-          turnsPlayed: 0, // track turns
+          turnsPlayed: 0,
           color: availableColors[i % availableColors.length],
         }));
       };
-
-      // Load state from local storage on initial mount
+      
+      // Load state from local storage on mount
       useEffect(() => {
         try {
           const storedState = localStorage.getItem(GAME_STORAGE_KEY);
           if (storedState) {
-            const parsedState = JSON.parse(storedState);
-            setTeams(parsedState.teams || []);
-            setCurrentScreen(parsedState.currentScreen || 'setup');
-            setCurrentTeamIndex(parsedState.currentTeamIndex || 0);
-            setTimer(parsedState.timer !== undefined ? parsedState.timer : 30);
-            setIsTimerRunning(parsedState.isTimerRunning !== undefined ? parsedState.isTimerRunning : false);
-            setGameWordsList(parsedState.gameWordsList || []);
-            setUsedWords(parsedState.usedWords || []);
+            const parsed = JSON.parse(storedState);
+            setTeams(parsed.teams || []);
+            setCurrentScreen(parsed.currentScreen || 'setup');
+            setCurrentTeamIndex(parsed.currentTeamIndex || 0);
+            setTimer(parsed.timer !== undefined ? parsed.timer : 30);
+            setIsTimerRunning(parsed.isTimerRunning !== undefined ? parsed.isTimerRunning : false);
+            setGameWordsList(parsed.gameWordsList || []);
+            setUsedWords(parsed.usedWords || []);
           }
         } catch (e) {
-          console.error("Failed to load state from local storage:", e);
+          console.error("Failed to load state:", e);
         }
         setLoading(false);
       }, []);
 
-      // Save state to local storage whenever a relevant state changes
+      // Persist state
       useEffect(() => {
         if (loading) return;
         const gameState = {
@@ -117,11 +138,11 @@
         try {
           localStorage.setItem(GAME_STORAGE_KEY, JSON.stringify(gameState));
         } catch (e) {
-          console.error("Failed to save state to local storage:", e);
+          console.error("Failed to save state:", e);
         }
       }, [teams, currentScreen, currentTeamIndex, timer, isTimerRunning, gameWordsList, usedWords, loading]);
 
-      // Handle timer logic
+      // Timer
       useEffect(() => {
         if (isTimerRunning && timer > 0) {
           timerIntervalRef.current = setInterval(() => {
@@ -138,15 +159,27 @@
         return () => clearInterval(timerIntervalRef.current);
       }, [isTimerRunning, timer]);
 
-      // Handle time's up screen transition
+      // Time's up overlay + audio
       useEffect(() => {
         if (isTimesUp) {
+          if (!audioRef.current) {
+            audioRef.current = new Audio('https://res.cloudinary.com/dl4qho6ia/video/upload/v1758802240/sound_zb7rqv.wav');
+            audioRef.current.loop = true;
+          }
+          try { audioRef.current.play(); } catch (e) { console.error("Autoplay blocked:", e); }
+
           timeoutRef.current = setTimeout(() => {
             setIsTimesUp(false);
             setCurrentScreen('scoreSelection');
           }, 2000);
         }
-        return () => clearTimeout(timeoutRef.current);
+        return () => {
+          if (audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current.currentTime = 0;
+          }
+          clearTimeout(timeoutRef.current);
+        };
       }, [isTimesUp]);
 
       const handleStartTurn = () => {
@@ -154,16 +187,15 @@
         setCurrentScreen('turn');
         setTimer(30);
 
-        const available = gameWords.filter(word => !usedWords.includes(word));
+        const available = gameWords.filter(w => !usedWords.includes(w));
         if (available.length < 5) {
           setModalMessage("Not enough words for a new turn! Starting a new game...");
           handleExitToHome();
           return;
         }
-
-        const shuffledWords = [...available].sort(() => 0.5 - Math.random()).slice(0, 5);
-        setGameWordsList(shuffledWords);
-        setUsedWords(prevUsed => [...prevUsed, ...shuffledWords]);
+        const picks = [...available].sort(() => 0.5 - Math.random()).slice(0, 5);
+        setGameWordsList(picks);
+        setUsedWords(prev => [...prev, ...picks]);
       };
 
       const handleConfirmScore = (finalScore) => {
@@ -172,25 +204,16 @@
         newTeams[currentTeamIndex].turnsPlayed++;
         setTeams(newTeams);
 
-        // Check if the game is over
-        const allTurnsCompleted = newTeams.every(team => team.turnsPlayed >= TOTAL_TURNS);
-
-        if (allTurnsCompleted) {
+        const allDone = newTeams.every(t => t.turnsPlayed >= TOTAL_TURNS);
+        if (allDone) {
           setCurrentScreen('end');
         } else {
-          // Move to the next team
-          const nextTeamIndex = (currentTeamIndex + 1) % newTeams.length;
-          setCurrentTeamIndex(nextTeamIndex);
+          const nextIdx = (currentTeamIndex + 1) % newTeams.length;
+          setCurrentTeamIndex(nextIdx);
           setCurrentScreen('lobby');
         }
       };
-
-      const handleTeamNameChange = (e, index) => {
-        const newTeams = [...teams];
-        newTeams[index].name = e.target.value;
-        setTeams(newTeams);
-      };
-
+      
       const getWinner = () => {
         if (teams.length === 0) return [];
         const maxScore = Math.max(...teams.map(t => t.score));
@@ -198,66 +221,50 @@
       };
 
       const performExit = () => {
-        // Stop timers
         clearInterval(timerIntervalRef.current);
         clearTimeout(timeoutRef.current);
-        
-        // Reset runtime state
         setTimer(30);
         setIsTimerRunning(false);
         setIsTimesUp(false);
         setIsMenuOpen(false);
         setUsedWords([]);
         setIsConfirmingExit(false);
-
-        // Clear saved state
         localStorage.removeItem(GAME_STORAGE_KEY);
-        
-        // Reset core game state
         setTeams([]);
         setCurrentTeamIndex(0);
         setCurrentScreen('setup');
       };
 
-      const handleExitToHome = () => {
-        setIsConfirmingExit(true);
-      };
+      const handleExitToHome = () => setIsConfirmingExit(true);
       
-      // Screen components
+      // Screens
 
       const SetupScreen = () => {
         const [numTeams, setNumTeams] = useState(teams.length > 0 ? teams.length : 2);
 
         useEffect(() => {
-          if (teams.length === 0 || teams.length !== numTeams) {
-            setTeams(createTeams(numTeams));
+          // Keep existing teams where possible
+          if (teams.length !== numTeams) {
+            const next = Array.from({ length: numTeams }, (_, i) => teams[i] || {
+              id: makeId(),
+              name: `Team ${i + 1}`,
+              score: 0,
+              turnsPlayed: 0,
+              color: availableColors[i % availableColors.length],
+            });
+            setTeams(next);
           }
-        }, [numTeams]);
+        }, [numTeams, teams]);
 
-        const handleIncrement = () => {
-          if (numTeams < 8) {
-            setNumTeams(prev => prev + 1);
-          }
-        };
-
-        const handleDecrement = () => {
-          if (numTeams > 2) {
-            setNumTeams(prev => prev - 1);
-          }
-        };
-
+        const handleIncrement = () => numTeams < 8 && setNumTeams(n => n + 1);
+        const handleDecrement = () => numTeams > 2 && setNumTeams(n => n - 1);
         const handleStartGame = () => {
-          if (teams.some(team => team.name.trim() === '')) {
-            setModalMessage('Please enter names for all teams.');
-            return;
-          }
           setCurrentScreen('lobby');
           setCurrentTeamIndex(0);
         };
 
         return (
           <div className="flex flex-col items-center justify-center p-6 space-y-6">
-            {/* Placeholder for the logo. Replace the src with your public logo URL. */}
             <img
               src="https://res.cloudinary.com/dl4qho6ia/image/upload/v1758680393/30_SECONDS_oqivzk.png"
               alt="Game Logo"
@@ -270,47 +277,23 @@
                 Number of Teams
               </label>
               <div className="flex items-center justify-center space-x-4 mb-4">
-                <button
-                  onClick={handleDecrement}
-                  className="p-3 bg-gray-700 text-white rounded-lg shadow-md hover:bg-gray-600 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={numTeams <= 2}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-                  </svg>
+                <button onClick={handleDecrement} className="p-3 bg-gray-700 text-white rounded-lg shadow-md hover:bg-gray-600 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed" disabled={numTeams <= 2}>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4"/></svg>
                 </button>
-                <div className="text-3xl font-extrabold text-white w-12 text-center">
-                  {numTeams}
-                </div>
-                <button
-                  onClick={handleIncrement}
-                  className="p-3 bg-gray-700 text-white rounded-lg shadow-md hover:bg-gray-600 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={numTeams >= 8}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
+                <div className="text-3xl font-extrabold text-white w-12 text-center">{numTeams}</div>
+                <button onClick={handleIncrement} className="p-3 bg-gray-700 text-white rounded-lg shadow-md hover:bg-gray-600 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed" disabled={numTeams >= 8}>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4"/></svg>
                 </button>
               </div>
               <div className="space-y-4 max-h-80 overflow-y-auto">
-                {teams.map((team, index) => (
-                  <input
-                    key={team.id}
-                    type="text"
-                    placeholder="Enter your team name"
-                    value={team.name}
-                    onChange={(e) => handleTeamNameChange(e, index)}
-                    onFocus={() => console.log(`Input for ${team.name} gained focus.`)}
-                    onBlur={() => console.log(`Input for ${team.name} lost focus.`)}
-                    className="w-full p-3 rounded-lg text-gray-900 bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-center placeholder-gray-500 placeholder:text-center"
-                  />
+                <h3 className="text-xl font-medium text-gray-300 text-center mb-2">Teams</h3>
+                {teams.map(team => (
+                  <div key={team.id} style={{ borderColor: team.color }} className="flex items-center p-3 rounded-lg border-l-8 bg-gray-900 shadow-sm">
+                    <span className="text-lg font-medium text-white">{team.name}</span>
+                  </div>
                 ))}
               </div>
-              <button
-                onClick={handleStartGame}
-                className="w-full mt-6 py-4 px-6 text-xl font-bold text-white rounded-xl shadow-lg transform transition-transform duration-200 hover:scale-105 active:scale-95"
-                style={{ backgroundColor: '#B03D22' }}
-              >
+              <button onClick={handleStartGame} className="w-full mt-6 py-4 px-6 text-xl font-bold text-white rounded-xl shadow-lg transform transition-transform duration-200 hover:scale-105 active:scale-95" style={{ backgroundColor: '#B03D22' }}>
                 Start Game
               </button>
             </div>
@@ -327,35 +310,20 @@
 
         return (
           <div className="flex flex-col items-center justify-center p-6 space-y-6">
-            <h1 className="text-4xl font-bold text-white">Scoreboard</h1>
+            <h1 className="text-5xl md:text-6xl font-bold text-white mb-4" style={{ fontFamily: '"Honk", cursive' }}>Scoreboard</h1>
             <div className="w-full max-w-lg p-6 bg-gray-800 rounded-lg shadow-xl space-y-4">
               {teams.map((team, index) => (
-                <div
-                  key={team.id}
-                  style={{ borderColor: team.color }}
-                  className={`flex items-center justify-between p-4 rounded-lg border-l-8 transition-transform duration-200 ${
-                    index === currentTeamIndex ? 'scale-105 bg-gray-700' : 'bg-gray-900'
-                  }`}
-                >
-                  <span className="text-xl font-medium text-white">{team.name}</span>
-                  <span className="text-3xl font-bold text-white" style={{ marginLeft: '5px' }}>{team.score}</span>
+                <div key={team.id} style={{ borderColor: team.color }} className={`flex items-center justify-between p-4 rounded-lg border-l-8 transition-transform duration-200 ${index === currentTeamIndex ? 'scale-105 bg-gray-700' : 'bg-gray-900'}`}>
+                  <span className="text-2xl font-medium text-white" style={{ fontFamily: '"Racing Sans One", sans-serif' }}>{team.name}</span>
+                  <span className="text-4xl font-bold text-white" style={{ marginLeft: '5px' }}>{team.score}</span>
                 </div>
               ))}
             </div>
             <div className="flex flex-col items-center mt-6 space-y-4">
               <p className="text-2xl font-semibold text-gray-300">Next Team:</p>
-              <p
-                className="text-4xl font-extrabold text-white"
-                style={{ textShadow: `0 0 10px ${nextTeam.color}` }}
-              >
-                {nextTeam.name}
-              </p>
+              <p className="text-4xl font-extrabold text-white" style={{ textShadow: `0 0 10px ${nextTeam.color}`, fontFamily: '"Racing Sans One", sans-serif' }}>{nextTeam.name}</p>
               <p className="text-lg font-medium text-gray-400">Turns Remaining: {turnsRemaining}</p>
-              <button
-                onClick={handleStartTurn}
-                className="py-4 px-8 text-2xl font-bold text-white rounded-xl shadow-lg transform transition-transform duration-200 hover:scale-105 active:scale-95"
-                style={{ backgroundColor: '#B03D22' }}
-              >
+              <button onClick={handleStartTurn} className="py-4 px-8 text-2xl font-bold text-white rounded-xl shadow-lg transform transition-transform duration-200 hover:scale-105 active:scale-95" style={{ backgroundColor: '#B03D22' }}>
                 START
               </button>
             </div>
@@ -369,29 +337,24 @@
 
         return (
           <div className="flex flex-col items-center justify-between h-full p-6">
-            <h2 className="text-3xl font-bold text-white mb-4">{team.name}'s Turn</h2>
-            <div className="relative w-48 h-48 sm:w-64 sm:h-64 flex items-center justify-center mb-8">
-              <div
-                className="w-full h-full rounded-full transition-all duration-300"
-                style={{
-                  background: `conic-gradient(${team.color} ${percentage}%, #4b5563 ${percentage}%)`,
-                }}
-              ></div>
-              <div className="absolute inset-2 bg-gray-900 rounded-full flex items-center justify-center">
-                <span className="text-6xl font-extrabold text-white">{timer}</span>
-              </div>
+            <div className="w-full max-w-lg p-4 bg-gray-800 rounded-lg shadow-lg mb-6 text-center">
+              <h2 className="text-3xl font-bold text-white" style={{ fontFamily: '"Racing Sans One", sans-serif' }}>
+                Current Team: <span style={{ color: team.color }}>{team.name}</span>
+              </h2>
             </div>
             <div className="w-full max-w-lg p-4 bg-gray-800 rounded-lg shadow-lg mb-6 text-center">
-              <h3 className="text-xl font-semibold text-white mb-2">Words</h3>
               <div className="space-y-3">
                 {gameWordsList.map((word, index) => (
-                  <button
-                    key={index}
-                    className="w-full p-4 rounded-xl shadow-md text-white text-lg font-medium transition-colors duration-200 bg-gray-700 pointer-events-none"
-                  >
+                  <button key={index} className="w-full p-4 rounded-xl shadow-md text-white text-lg font-medium transition-colors duration-200 bg-gray-700 pointer-events-none">
                     {word}
                   </button>
                 ))}
+              </div>
+            </div>
+            <div className="relative w-28 h-28 sm:w-40 sm:h-40 flex items-center justify-center">
+              <div className="w-full h-full rounded-full transition-all duration-300" style={{ background: `conic-gradient(${team.color} ${percentage}%, #4b5563 ${percentage}%)` }}></div>
+              <div className="absolute inset-2 bg-gray-900 rounded-full flex items-center justify-center">
+                <span className="text-5xl font-extrabold text-white" style={{ fontFamily: '"Orbitron", sans-serif' }}>{timer}</span>
               </div>
             </div>
           </div>
@@ -404,23 +367,21 @@
 
         const toggleWordSelection = (word) => {
           setSelectedWords(prev => {
-            const newSet = new Set(prev);
-            if (newSet.has(word)) {
-              newSet.delete(word);
-            } else {
-              newSet.add(word);
-            }
-            return newSet;
+            const next = new Set(prev);
+            next.has(word) ? next.delete(word) : next.add(word);
+            return next;
           });
         };
 
         const score = selectedWords.size;
 
         return (
-          <div className="flex flex-col items-center justify-between h-full p-6 bg-gray-950">
-            <h2 className="text-3xl font-bold text-white mb-4">Select Correct Words</h2>
+          <div className="flex flex-col items-center justify-between h-full p-6 bg-transparent">
+            <h2 className="text-3xl font-bold text-white mb-4" style={{ fontFamily: '"Bakbak One", sans-serif' }}>
+              Select <span style={{ color: '#159142' }}>Correct</span> Answers
+            </h2>
             <div className="w-full max-w-lg p-4 bg-gray-800 rounded-lg shadow-lg mb-6 text-center">
-              <h3 className="text-xl font-semibold text-white mb-2">{team.name}'s Score: {score}</h3>
+              <h3 className="text-2xl font-semibold text-white mb-2" style={{ fontFamily: '"Racing Sans One", sans-serif' }}>{team.name}'s Score: {score}</h3>
               <div className="space-y-3">
                 {gameWordsList.map((word, index) => (
                   <button
@@ -435,11 +396,7 @@
                 ))}
               </div>
             </div>
-            <button
-              onClick={() => handleConfirmScore(score)}
-              className="w-full max-w-sm py-4 px-6 text-xl font-bold text-white rounded-xl shadow-lg transform transition-transform duration-200 hover:scale-105 active:scale-95"
-              style={{ backgroundColor: '#B03D22' }}
-            >
+            <button onClick={() => handleConfirmScore(score)} className="w-full max-w-sm py-4 px-6 text-xl font-bold text-white rounded-xl shadow-lg transform transition-transform duration-200 hover:scale-105 active:scale-95" style={{ backgroundColor: '#B03D22' }}>
               Confirm Score
             </button>
           </div>
@@ -451,63 +408,49 @@
         return (
           <div className="flex flex-col items-center justify-center p-6 space-y-6">
             <h1 className="text-4xl font-bold text-white mb-4">Game Over!</h1>
-            <h2 className="text-3xl font-extrabold text-white text-center">
-              {winners.length > 1 ? "It's a tie!" : "Winner:"}
-            </h2>
-            {winners.map(winner => (
-              <h3
-                key={winner.id}
-                className="text-5xl font-extrabold"
-                style={{ color: winner.color }}
-              >
-                {winner.name}
-              </h3>
+            <h2 className="text-3xl font-extrabold text-white text-center">{winners.length > 1 ? "It's a tie!" : "Winner:"}</h2>
+            {winners.map(w => (
+              <h3 key={w.id} className="text-5xl font-extrabold" style={{ color: w.color, fontFamily: '"Racing Sans One", sans-serif' }}>{w.name}</h3>
             ))}
             <div className="w-full max-w-lg p-6 bg-gray-800 rounded-lg shadow-xl space-y-4 mt-6">
               <h3 className="text-xl font-bold text-white mb-2">Final Scores</h3>
-              {[...teams].sort((a, b) => b.score - a.score).map((team) => (
-                <div
-                  key={team.id}
-                  style={{ borderColor: team.color }}
-                  className="flex items-center justify-between p-4 rounded-lg border-l-8 bg-gray-900"
-                >
-                  <span className="text-xl font-medium text-white">{team.name}</span>
-                  <span className="text-3xl font-bold text-white">{team.score}</span>
+              {[...teams].sort((a, b) => b.score - a.score).map(team => (
+                <div key={team.id} style={{ borderColor: team.color }} className="flex items-center justify-between p-4 rounded-lg border-l-8 bg-gray-900">
+                  <span className="text-2xl font-medium text-white" style={{ fontFamily: '"Racing Sans One", sans-serif' }}>{team.name}</span>
+                  <span className="text-4xl font-bold text-white">{team.score}</span>
                 </div>
               ))}
             </div>
-            <button
-              onClick={handleExitToHome}
-              className="mt-6 py-4 px-8 text-xl font-bold text-white rounded-xl shadow-lg transform transition-transform duration-200 hover:scale-105 active:scale-95"
-              style={{ backgroundColor: '#B03D22' }}
-            >
+            <button onClick={handleExitToHome} className="mt-6 py-4 px-8 text-xl font-bold text-white rounded-xl shadow-lg transform transition-transform duration-200 hover:scale-105 active:scale-95" style={{ backgroundColor: '#B03D22' }}>
               Exit to Home
             </button>
           </div>
         );
       };
 
-      const MobileNav = () => {
+      const MobileNav = ({ currentScreen }) => {
+        const showReturnHome = currentScreen === 'lobby' || currentScreen === 'turn';
         return (
           <>
             <div className="fixed top-0 left-0 w-full p-4 z-50">
-              <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-white">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ transform: isMenuOpen ? 'rotate(90deg)' : 'rotate(0deg)' }}>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
+              <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-white p-2 rounded-full transition-all duration-300 transform hover:bg-gray-800 focus:outline-none">
+                <svg className={`h-8 w-8 transition-transform duration-300 ease-in-out transform ${isMenuOpen ? 'rotate-90' : 'rotate-0'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path className={`${isMenuOpen ? 'opacity-0' : 'opacity-100'}`} strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  <path className={`${isMenuOpen ? 'opacity-100' : 'opacity-0'}`} strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
-            <div className={`fixed inset-0 bg-gray-900 bg-opacity-95 z-40 transition-transform duration-300 ease-in-out ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+            <div className={`fixed inset-0 bg-gray-900 bg-opacity-95 backdrop-blur-sm z-40 transition-transform duration-300 ease-in-out ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
               <div className="flex flex-col items-center justify-center h-full space-y-8 p-6">
-                <button onClick={() => { setIsAboutOpen(true); setIsMenuOpen(false); }} className="text-4xl font-bold text-white rounded-xl py-4 px-6 w-full max-w-xs transition-colors duration-200 hover:bg-gray-800">
-                  About
-                </button>
-                <button onClick={() => { setIsRulesOpen(true); setIsMenuOpen(false); }} className="text-4xl font-bold text-white rounded-xl py-4 px-6 w-full max-w-xs transition-colors duration-200 hover:bg-gray-800">
-                  House Rules
-                </button>
-                <button onClick={handleExitToHome} className="text-4xl font-bold text-white rounded-xl py-4 px-6 w-full max-w-xs transition-colors duration-200 hover:bg-gray-800">
-                  Return to Home
-                </button>
+                <button onClick={() => { setIsAboutOpen(true); setIsMenuOpen(false); }} className="text-2xl font-bold text-white rounded-xl py-4 px-6 w-full max-w-xs transition-all duration-200 hover:scale-105 active:scale-95 hover:bg-gray-800">About</button>
+                <div className="w-full max-w-xs h-px bg-gray-700 my-2"></div>
+                <button onClick={() => { setIsRulesOpen(true); setIsMenuOpen(false); }} className="text-2xl font-bold text-white rounded-xl py-4 px-6 w-full max-w-xs transition-all duration-200 hover:scale-105 active:scale-95 hover:bg-gray-800">House Rules</button>
+                {showReturnHome && (
+                  <>
+                    <div className="w-full max-w-xs h-px bg-gray-700 my-2"></div>
+                    <button onClick={handleExitToHome} className="text-2xl font-bold text-white rounded-xl py-4 px-6 w-full max-w-xs transition-all duration-200 hover:scale-105 active:scale-95 hover:bg-gray-800">Return to Home</button>
+                  </>
+                )}
               </div>
             </div>
           </>
@@ -520,105 +463,88 @@
           <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
             <div className="bg-gray-800 p-6 rounded-lg shadow-2xl max-w-sm w-full text-center">
               <p className="text-white text-lg font-medium mb-4">{message}</p>
-              <button
-                onClick={onClose}
-                className="py-2 px-6 text-white rounded-lg font-bold"
-                style={{ backgroundColor: '#B03D22' }}
-              >
-                OK
-              </button>
+              <button onClick={onClose} className="py-2 px-6 text-white rounded-lg font-bold" style={{ backgroundColor: '#B03D22' }}>OK</button>
             </div>
-            </div>
+          </div>
         );
       };
       
-      const AboutScreen = ({ onClose }) => (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-95 z-50 flex items-center justify-center p-4">
-          <div className="bg-gray-800 p-8 rounded-xl shadow-2xl max-w-md w-full text-center space-y-4">
-            <h2 className="text-4xl font-bold text-white">About the Game</h2>
-            <p className="text-gray-300 text-lg">Beat the Buzzer! is a digital adaptation of the popular party game, where teams race against the clock to guess words from a variety of categories.</p>
-            <p className="text-gray-300 text-lg">Created by Lovemore Manyuwa</p>
-            <button onClick={onClose} className="mt-4 py-3 px-8 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-colors">
-              Close
-            </button>
+      const AboutScreen = ({ onClose }) => {
+        const [isVisible, setIsVisible] = useState(false);
+        useEffect(() => { setIsVisible(true); }, []);
+        return (
+          <div className={`fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end sm:items-center justify-center transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
+            <div className={`bg-white rounded-t-xl sm:rounded-xl shadow-2xl w-full max-w-md p-8 text-center space-y-6 transition-transform duration-500 ease-out transform ${isVisible ? 'translate-y-0' : 'translate-y-full'}`}>
+              <h2 className="text-4xl font-bold" style={{ color: '#B03D22', fontFamily: '"Bakbak One", sans-serif' }}>About 30 Seconds</h2>
+              <p className="text-gray-800 text-lg"><span className="font-bold" style={{ color: '#B03D22' }}>30 Seconds: Beat the Buzzer!</span> is a digital adaptation of the popular party game, where teams race against the clock to guess words from a variety of categories.</p>
+              <p className="text-gray-600 text-base">Created by Lovemore Manyuwa</p>
+              <div className="flex items-center justify-center space-x-2 mt-4 text-blue-600 hover:text-blue-800 transition-colors duration-200">
+                <a href="https://linkedin.com/in/lovemany" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-2 font-bold">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.768s.784-1.767 1.75-1.767 1.75.79 1.75 1.767-.783 1.768-1.75 1.768zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                  <span>Lovemore Manyuwa</span>
+                </a>
+              </div>
+              <button onClick={onClose} className="w-full py-3 px-8 text-white font-bold rounded-xl hover:bg-blue-700 transition-colors" style={{ backgroundColor: '#B03D22' }}>Close</button>
+            </div>
           </div>
-        </div>
-      );
+        );
+      };
 
-      const HouseRulesScreen = ({ onClose }) => (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-95 z-50 flex items-center justify-center p-4">
-          <div className="bg-gray-800 p-8 rounded-xl shadow-2xl max-w-md w-full text-center space-y-4">
-            <h2 className="text-4xl font-bold text-white">House Rules</h2>
-            <ul className="text-left text-gray-300 space-y-2 list-disc list-inside">
-              <li>Teams take turns describing words to each other within a 30-second time limit.</li>
-              <li>No using rhymes, gestures, or parts of the word itself.</li>
-              <li>Once a word is guessed, the team moves on to the next.</li>
-              <li>The team with the highest score after all rounds wins.</li>
-            </ul>
-            <button onClick={onClose} className="mt-4 py-3 px-8 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-colors">
-              Close
-            </button>
+      const HouseRulesScreen = ({ onClose }) => {
+        const [isVisible, setIsVisible] = useState(false);
+        useEffect(() => { setIsVisible(true); }, []);
+        return (
+          <div className={`fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end sm:items-center justify-center transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
+            <div className={`bg-white rounded-t-xl sm:rounded-xl shadow-2xl w-full max-w-md p-8 text-left space-y-6 transition-transform duration-500 ease-out transform ${isVisible ? 'translate-y-0' : 'translate-y-full'}`}>
+              <h2 className="text-4xl font-bold text-center" style={{ color: '#B03D22', fontFamily: '"Bakbak One", sans-serif' }}>House Rules – How to Play 30 Seconds</h2>
+              <div className="text-gray-800 text-lg space-y-4 max-h-[60vh] overflow-y-auto">
+                <p><span className="font-bold" style={{ color: '#B03D22' }}>Teams:</span> Players divide into two or more teams. Each team takes turns.</p>
+                <p><span className="font-bold" style={{ color: '#B03D22' }}>Objective:</span> Guess as many words as possible from 5-word cards within <span className="font-bold" style={{ color: '#B03D22' }}>30 seconds</span>.</p>
+                <p><span className="font-bold" style={{ color: '#B03D22' }}>Describing Words:</span> The clue-giver describes without saying the word itself.</p>
+                <p><span className="font-bold" style={{ color: '#B03D22' }}>Scoring:</span> One point per correct word.</p>
+                <p><span className="font-bold" style={{ color: '#B03D22' }}>Winning:</span> Highest total score wins.</p>
+                <p><span className="font-bold" style={{ color: '#B03D22' }}>Timing:</span> A strict 30-second timer per turn.</p>
+                <p><span className="font-bold" style={{ color: '#B03D22' }}>Fun Rule:</span> Be creative—no spelling or rhyming the exact word.</p>
+              </div>
+              <button onClick={onClose} className="w-full py-3 px-8 text-white font-bold rounded-xl hover:bg-blue-700 transition-colors" style={{ backgroundColor: '#B03D22' }}>Close</button>
+            </div>
           </div>
-        </div>
-      );
+        );
+      };
 
       const ConfirmExitModal = ({ onConfirm, onCancel }) => (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
           <div className="bg-gray-800 p-6 rounded-lg shadow-2xl max-w-sm w-full text-center">
             <p className="text-white text-lg font-medium mb-6">Are you sure you want to cancel the game and return to Home?</p>
             <div className="flex justify-center space-x-4">
-              <button
-                onClick={onConfirm}
-                className="py-2 px-6 text-white rounded-lg font-bold transition-colors duration-200"
-                style={{ backgroundColor: '#B03D22' }}
-              >
-                Yes, Exit
-              </button>
-              <button
-                onClick={onCancel}
-                className="py-2 px-6 text-gray-800 bg-gray-200 rounded-lg font-bold transition-colors duration-200 hover:bg-gray-300"
-              >
-                No, Continue
-              </button>
+              <button onClick={onConfirm} className="py-2 px-6 text-white rounded-lg font-bold transition-colors duration-200" style={{ backgroundColor: '#B03D22' }}>Yes, Exit</button>
+              <button onClick={onCancel} className="py-2 px-6 text-gray-800 bg-gray-200 rounded-lg font-bold transition-colors duration-200 hover:bg-gray-300">No, Continue</button>
             </div>
           </div>
         </div>
       );
       
+      // Screen router
       let content;
       switch (currentScreen) {
-        case 'setup':
-          content = <SetupScreen />;
-          break;
-        case 'lobby':
-          content = <LobbyScreen />;
-          break;
-        case 'turn':
-          content = <TurnScreen />;
-          break;
-        case 'scoreSelection':
-          content = <ScoreSelectionScreen />;
-          break;
-        case 'end':
-          content = <EndScreen />;
-          break;
-        default:
-          content = <SetupScreen />;
-          break;
+        case 'setup': content = <SetupScreen />; break;
+        case 'lobby': content = <LobbyScreen />; break;
+        case 'turn': content = <TurnScreen />; break;
+        case 'scoreSelection': content = <ScoreSelectionScreen />; break;
+        case 'end': content = <EndScreen />; break;
+        default: content = <SetupScreen />; break;
       }
 
       return (
         <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center p-4 font-sans">
-          <MobileNav />
+          <MobileNav currentScreen={currentScreen} />
           <div className="w-full max-w-2xl min-h-[90vh] bg-gray-900 rounded-2xl shadow-2xl p-6 flex flex-col justify-center items-center">
             {loading ? (
               <div className="flex flex-col items-center">
                 <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2" style={{ borderColor: '#B03D22' }}></div>
                 <p className="text-white text-xl">Loading Game...</p>
               </div>
-            ) : (
-              content
-            )}
+            ) : content}
           </div>
           {isTimesUp && (
             <div className="fixed inset-0 bg-red-800 flex items-center justify-center z-50">
